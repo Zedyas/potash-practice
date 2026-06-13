@@ -1,0 +1,6 @@
+sku,name,category,price,cost,stock,warehouse
+CMP-100,Compressor,HVAC,489.00,310.00,12,CHI
+,Fan Motor,HVAC,75.50,42.00,0,DAL
+THR-310,Thermostat,Controls,32.00,18.50,41,
+FLT-410,Filter Kit,Consumables,18.75,7.20,120,SEA
+VAL-500,Expansion Valve,HVAC,155.00,92.00,6,

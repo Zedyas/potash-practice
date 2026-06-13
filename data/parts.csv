@@ -1,0 +1,11 @@
+sku,name,category,price,cost,stock,warehouse,updated_at,status
+CMP-100,Compressor,HVAC,489.00,310.00,12,CHI,2026-06-10T12:00:00Z,active
+FAN-220,Fan Motor,HVAC,75.50,42.00,0,CHI,2026-06-11T09:30:00Z,active
+THR-310,Thermostat,Controls,32.00,18.50,41,DAL,2026-06-09T15:45:00Z,active
+FLT-410,Filter Kit,Consumables,18.75,7.20,120,SEA,2026-06-08T08:20:00Z,active
+VAL-500,Expansion Valve,HVAC,155.00,92.00,6,DAL,2026-06-07T13:10:00Z,active
+SNS-610,Temperature Sensor,Controls,44.25,22.00,35,SEA,2026-06-12T10:05:00Z,active
+BRD-720,Control Board,Electronics,220.00,140.00,3,CHI,2026-06-06T16:25:00Z,active
+MTR-830,Blower Motor,HVAC,310.00,205.00,2,DAL,2026-06-05T11:15:00Z,active
+GSK-940,Gasket Pack,Consumables,12.00,3.75,200,SEA,2026-06-04T17:00:00Z,inactive
+PMP-050,Condensate Pump,HVAC,98.00,61.00,9,CHI,2026-06-03T14:40:00Z,active

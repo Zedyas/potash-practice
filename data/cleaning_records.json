@@ -1,0 +1,31 @@
+{
+  "customer_records": [
+    {"customer_id": "C-100", "name": "Northwind HVAC", "email": "buyer@northwind.example", "phone": "312-555-0100", "last_order": "CMP-100"},
+    {"customer_id": "C-101", "name": "Lakefront Supply", "tax_id": "12-3456789", "last_order": "FAN-220"}
+  ],
+  "raw_part_records": [
+    {"sku": " cmp-100 ", "name": "Compressor", "price": "$489.00"},
+    {"sku": "", "name": "Fan Motor", "price": "75.50"},
+    {"sku": "THR-310", "name": "", "price": "32.00"},
+    {"sku": "VAL-500", "name": "Expansion Valve", "price": "bad"}
+  ],
+  "status_records": [
+    {"order_id": "O-1001", "status_code": "SHP"},
+    {"order_id": "O-1002", "status_code": "DLV"},
+    {"order_id": "O-1003", "status_code": "RTN"}
+  ],
+  "pipeline_records": [
+    {"sku": " cmp-100 ", "name": "Compressor", "category": "HVAC", "price": "$489.00"},
+    {"sku": " fan-220 ", "name": "Fan Motor", "category": null, "price": "75.50"}
+  ],
+  "duplicate_parts": [
+    {"id": "r1", "sku": " cmp-100 ", "name": "Compressor", "price": 489.0, "updated_at": "2026-06-10T09:00:00Z"},
+    {"id": "r2", "sku": "CMP-100", "name": "Compressor", "price": 489.0, "category": "HVAC", "updated_at": "2026-06-11T09:00:00Z"},
+    {"id": "r3", "sku": "FAN-220", "name": "Fan Motor", "updated_at": "2026-06-09T09:00:00Z"},
+    {"id": "r4", "sku": "fan-220", "name": "Fan Motor", "price": 75.5, "updated_at": "2026-06-09T09:00:00Z"}
+  ],
+  "vendor_samples": [
+    {"vendor": "vendor_a", "record": {"part_no": " cmp-100 ", "description": "Compressor", "unit_price": "$489.00", "is_active": "Y"}},
+    {"vendor": "vendor_b", "record": {"sku": "fan-220", "title": "Fan Motor", "price_usd": "75.50", "status": "active"}}
+  ]
+}

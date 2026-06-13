@@ -1,0 +1,5 @@
+sku,name,price,category
+CMP-100,Compressor,489.00,HVAC
+FAN-220,Fan Motor,75.50,HVAC
+CMP-100,Compressor Duplicate,489.00,HVAC
+THR-310,Thermostat,-32.00,Controls

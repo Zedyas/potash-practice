@@ -1,0 +1,4 @@
+{"event_id": "evt-1001", "pipeline": "orders_sync", "status": "success"}
+{"event_id": "evt-1002", "pipeline": "parts_embed", "status": "failed"}
+{"event_id": "evt-1003", "pipeline": "inventory_sync", "status": "success"
+{"event_id": "evt-1004", "pipeline": "orders_sync", "status": "success"}

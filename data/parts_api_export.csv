@@ -1,0 +1,5 @@
+sku,name,category,price,updated_at,warehouse
+CMP-100,Compressor,HVAC,489.00,2026-06-10T12:00:00Z,CHI
+FAN-220,Fan Motor,HVAC,75.50,2026-06-11T09:30:00Z,
+THR-310,Thermostat,Controls,32.00,2026-06-09T15:45:00Z,DAL
+FLT-410,Filter Kit,,18.75,2026-06-08T08:20:00Z,SEA

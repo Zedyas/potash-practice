@@ -1,0 +1,27 @@
+{
+  "runs": [
+    {"pipeline": "orders_sync", "run_id": 1, "ts": "2026-06-11T10:00:00Z", "status": "running"},
+    {"pipeline": "orders_sync", "run_id": 2, "ts": "2026-06-11T10:05:00Z", "status": "success"},
+    {"pipeline": "parts_embed", "run_id": 3, "ts": "2026-06-11T09:00:00Z", "status": "failed"},
+    {"pipeline": "parts_embed", "run_id": 4, "ts": "2026-06-12T09:30:00Z", "status": "success"}
+  ],
+  "log_events": [
+    {"pipeline": "orders_sync", "error_code": "HTTP_500", "message": "warehouse API timeout"},
+    {"pipeline": "orders_sync", "error_code": "HTTP_500", "message": "warehouse API timeout"},
+    {"pipeline": "orders_sync", "error_code": "SCHEMA_MISMATCH", "message": "missing qty_ordered"},
+    {"pipeline": "orders_sync", "error_code": "AUTH", "message": "token expired"},
+    {"pipeline": "parts_embed", "error_code": "VECTOR_DIM", "message": "embedding dimension mismatch"},
+    {"pipeline": "parts_embed", "error_code": "VECTOR_DIM", "message": "embedding dimension mismatch"},
+    {"pipeline": "parts_embed", "error_code": "HTTP_429", "message": "rate limited"},
+    {"pipeline": "inventory_sync", "error_code": "HTTP_500", "message": "source unavailable"}
+  ],
+  "dependencies": {
+    "parts_catalog": [],
+    "orders_sync": ["parts_catalog"],
+    "parts_embed": ["parts_catalog"],
+    "answer_index": ["orders_sync", "parts_embed"],
+    "daily_eval": ["answer_index"]
+  },
+  "part_ids": ["CMP-100", "FAN-220", "THR-310", "VAL-500", "BRD-720", "SNS-610"],
+  "product_ids": ["BTC-USD", "ETH-USD", "SOL-USD", "ADA-USD", "DOGE-USD"]
+}

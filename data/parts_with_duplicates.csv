@@ -1,0 +1,6 @@
+sku,name,category,updated_at
+CMP-100,Compressor,HVAC,2026-06-10T12:00:00Z
+CMP-100,Compressor - older duplicate,HVAC,2026-06-01T12:00:00Z
+FAN-220,Fan Motor,HVAC,2026-06-11T09:30:00Z
+THR-310,Thermostat,Controls,2026-06-09T15:45:00Z
+VAL-500,Expansion Valve,HVAC,2026-06-07T13:10:00Z

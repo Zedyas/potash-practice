@@ -1,0 +1,62 @@
+{
+  "config": {
+    "model": "flash",
+    "temperature": 0.2,
+    "retry": {
+      "max": 3,
+      "backoff": 2
+    },
+    "features": {
+      "tool_calls": true,
+      "json_mode": true
+    }
+  },
+  "tool_response": {
+    "tool_calls": [
+      {
+        "name": "reserve_part",
+        "arguments": "{\"sku\": \"cmp-100\", \"quantity\": 2}"
+      },
+      {
+        "name": "reserve_part",
+        "arguments": "{\"sku\": \"fan-220\", \"quantity\": 0}"
+      },
+      {
+        "name": "reserve_part",
+        "arguments": "not json"
+      }
+    ]
+  },
+  "old_config": {
+    "timeout": 30,
+    "retry": {
+      "max": 3,
+      "backoff": 2
+    },
+    "model": "flash"
+  },
+  "new_config": {
+    "timeout": 45,
+    "retry": {
+      "max": 5,
+      "backoff": 2
+    },
+    "model": "pro",
+    "json_mode": true
+  },
+  "valid_inference_request": {
+    "prompt": "Summarize stock risk for CMP-100.",
+    "max_tokens": 600,
+    "model": "flash"
+  },
+  "bad_inference_request": {
+    "prompt": "   ",
+    "max_tokens": true,
+    "model": "legacy"
+  },
+  "api_payload": {
+    "partNumber": "CMP-100",
+    "displayName": "Compressor",
+    "unitPrice": "489.00"
+  }
+}

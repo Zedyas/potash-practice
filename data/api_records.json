@@ -1,0 +1,14 @@
+{
+  "records": [
+    {"sku": "CMP-100", "name": "Compressor", "stock": 12},
+    {"sku": "FAN-220", "name": "Fan Motor", "stock": 0},
+    {"sku": "THR-310", "name": "Thermostat", "stock": 41}
+  ],
+  "batch_records": [
+    {"sku": "CMP-100", "embedding_text": "Compressor for commercial HVAC systems"},
+    {"sku": "FAN-220", "embedding_text": "Fan motor replacement part"},
+    {"sku": "THR-310", "embedding_text": "Thermostat control part"},
+    {"sku": "VAL-500", "embedding_text": "Expansion valve for cooling loops"},
+    {"sku": "BRD-720", "embedding_text": "Control board for HVAC diagnostics"}
+  ]
+}
