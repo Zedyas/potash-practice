@@ -3194,7 +3194,7 @@ def fetch_with_courtesy(url):
         resp = requests.get(url, timeout=10)
     resp.raise_for_status()
     return resp.json()</code></pre>
-      <p class="note"><strong>Why honor the header:</strong> the server is telling you exactly when capacity returns — guessing shorter gets you banned, guessing longer wastes time. LLM APIs send this constantly under load.</p>
+      <p class="note"><strong>Why honor the header:</strong> the server is telling you exactly when capacity returns — guessing shorter gets you banned, guessing longer wastes time. LLM APIs send this constantly under load. <strong>Caveat:</strong> per the HTTP spec <code>Retry-After</code> can be either delta-seconds <em>or</em> an HTTP date (e.g. <code>Wed, 21 Oct 2026 07:28:00 GMT</code>) — production code should handle both; this drill assumes the seconds form.</p>
       </div></details>
     </div>
   </article>
@@ -3274,7 +3274,7 @@ def iter_trades(product_id='BTC-USD', limit=100):
 # Consumer example:
 # for trade in iter_trades('BTC-USD'):
 #     process(trade)</code></pre>
-      <p class="note"><strong>Why a generator:</strong> the consumer can stop early (e.g., found what it needed) and no further pages are fetched. <code>yield from</code> flattens the page — cleaner than a nested loop.</p>
+      <p class="note"><strong>Why a generator:</strong> the consumer can stop early (e.g., found what it needed) and no further pages are fetched. <code>yield from</code> flattens the page — cleaner than a nested loop. <strong>Caveat:</strong> the cursor field is API-specific — Coinbase uses the <code>CB-AFTER</code> header, but other APIs return the next cursor in the body or a <code>Link</code> header; always check your API's pagination contract.</p>
       </div></details>
     </div>
   </article>
@@ -3300,24 +3300,25 @@ def iter_trades(product_id='BTC-USD', limit=100):
 import time
 import requests
 
+class RetryableError(Exception):
+    """Transient failure worth retrying."""
+
 def fetch_with_retries(url, max_attempts=4, base_delay=1.0):
     for attempt in range(1, max_attempts + 1):
         try:
             resp = requests.get(url, timeout=10)
             if resp.status_code &gt;= 500 or resp.status_code == 429:
-                raise requests.exceptions.RetryError(
-                    f'HTTP {resp.status_code}'
-                )
+                raise RetryableError(f'HTTP {resp.status_code}')
             resp.raise_for_status()      # non-retryable 4xx → raises here
             return resp.json()
         except (requests.exceptions.Timeout,
                 requests.exceptions.ConnectionError,
-                requests.exceptions.RetryError):
+                RetryableError):
             if attempt == max_attempts:
                 raise
             delay = base_delay * 2 ** (attempt - 1) + random.uniform(0, 1)
             time.sleep(delay)</code></pre>
-      <p class="note"><strong>Why jitter:</strong> if 50 workers all fail at once and back off identically, they all retry at the same instant and knock the service over again (the "thundering herd"). Randomness spreads them out. Knowing <em>why</em> 4xx shouldn't be retried is the other half of this question.</p>
+      <p class="note"><strong>Why jitter:</strong> if 50 workers all fail at once and back off identically, they all retry at the same instant and knock the service over again (the "thundering herd"). Randomness spreads them out. Knowing <em>why</em> 4xx shouldn't be retried is the other half of this question. <strong>Style:</strong> a small custom <code>RetryableError</code> (rather than reusing <code>requests.exceptions.RetryError</code>) makes the retry signal explicit and matches the retry decorators in §05.</p>
       </div></details>
     </div>
   </article>
