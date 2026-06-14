@@ -1070,7 +1070,13 @@ with open('data/llm_payloads.json') as f:
     config = json.load(f)['config']
 
 pretty = json.dumps(config, indent=2, sort_keys=True)
-compact = json.dumps(config, separators=(',', ':'))</code></pre>
+compact = json.dumps(config, separators=(',', ':'))
+
+# compact → {"model":"flash","temperature":0.2,"retry":{"max":3,"backoff":2},...}
+# pretty (indent=2, sort_keys=True) begins:
+#   {
+#     "features": {
+#       "json_mode": true,</code></pre>
       <p class="note"><strong>Bonus point:</strong> <code>sort_keys=True</code> makes output deterministic — useful for diffing configs or building cache keys.</p>
       </div></details>
     </div>
@@ -1103,7 +1109,9 @@ compact = json.dumps(config, separators=(',', ':'))</code></pre>
     choices = response.get('choices') or []
     if not choices:
         return None
-    return choices[0].get('message', {}).get('content')</code></pre>
+    return choices[0].get('message', {}).get('content')
+
+# extract_text(response) → 'Part CMP-100 is in stock.'</code></pre>
       <p class="note"><strong>Gotcha:</strong> <code>response.get('choices') or []</code> also covers <code>'choices': None</code>, which plain <code>.get('choices', [])</code> would not — <code>get</code> defaults only kick in when the key is <em>absent</em>.</p>
       </div></details>
     </div>
@@ -1174,7 +1182,10 @@ get_nested(data, 'usage.cost.usd', 0)       # 0</code></pre>
             out.update(flatten(value, f'{full_key}.'))
         else:
             out[full_key] = value
-    return out</code></pre>
+    return out
+
+# flatten({'model': 'gemini', 'limits': {'rpm': 60, 'retry': {'max': 3}}})
+# → {'model': 'gemini', 'limits.rpm': 60, 'limits.retry.max': 3}</code></pre>
       <p class="note"><strong>Follow-up they may ask:</strong> what about lists? Common answers: keep them as-is, JSON-encode them, or index into the key (<code>items.0.sku</code>) — depends on the destination schema.</p>
       </div></details>
     </div>
@@ -1215,7 +1226,10 @@ EXPECTED_DIM = 3</code></pre>
         vectors[item['id']] = vec
     return vectors
 
-vectors = index_embeddings(response, EXPECTED_DIM)</code></pre>
+vectors = index_embeddings(response, EXPECTED_DIM)
+
+# vectors → {'CMP-100': [0.12, -0.4, 0.77], 'FAN-220': [0.05, 0.31, -0.18]}
+# (a wrong-length embedding would raise ValueError here, at the boundary)</code></pre>
       <p class="note"><strong>Why validate here:</strong> a wrong-dimension vector won't fail until it hits the vector store or a similarity computation — far from the cause. Fail loud at the boundary.</p>
       </div></details>
     </div>
@@ -1254,7 +1268,10 @@ def parse_jsonl(path):
                 records.append(json.loads(line))
             except json.JSONDecodeError as e:
                 errors.append((lineno, str(e)))
-    return records, errors</code></pre>
+    return records, errors
+
+# for this fixture → 3 valid records, 1 error
+# errors → [(3, "Expecting ',' delimiter: ...")]  # line 3 is truncated JSON</code></pre>
       <p class="note"><strong>Why it matters:</strong> JSONL is the default export format for BigQuery and most event systems. One bad line shouldn't kill a million-line load — but it should be <em>reported</em>, not swallowed.</p>
       </div></details>
     </div>
@@ -1290,7 +1307,10 @@ def parse_llm_json(text):
     try:
         return json.loads(candidate.strip())
     except json.JSONDecodeError:
-        return None</code></pre>
+        return None
+
+# parse_llm_json(reply) → {'sku': 'CMP-100', 'in_stock': True}
+# (the ```json fence is stripped before parsing)</code></pre>
       <p class="note"><strong>Real-world note:</strong> never trust an LLM to return bare JSON — strip fences, parse defensively, and validate the keys you need afterward. (Structured-output / JSON-mode APIs reduce but don't eliminate this.)</p>
       </div></details>
     </div>
@@ -1324,7 +1344,10 @@ override = {'retry': {'max': 5}, 'verbose': True}
             merged[key] = merge_config(merged[key], value)
         else:
             merged[key] = value
-    return merged</code></pre>
+    return merged
+
+# → {'timeout': 30, 'retry': {'max': 5, 'backoff': 2}, 'verbose': True}
+# (retry.max overridden to 5, but retry.backoff survives the deep merge)</code></pre>
       <p class="note"><strong>Gotcha:</strong> <code>{**defaults, **override}</code> or <code>defaults | override</code> is a <em>shallow</em> merge — it would replace the whole <code>retry</code> dict and lose <code>backoff</code>. Know the difference cold.</p>
       </div></details>
     </div>
@@ -1365,7 +1388,11 @@ rows = [
 
 records = [dict(zip(columns, row)) for row in rows]
 
-payload = json.dumps(records, default=str)</code></pre>
+payload = json.dumps(records, default=str)
+
+# payload → [{"sku": "CMP-100", "sold_on": "2026-06-10", "units": 4},
+#            {"sku": "FAN-220", "sold_on": "2026-06-11", "units": 9}]
+# (default=str turns each date into 'YYYY-MM-DD')</code></pre>
       <p class="note"><strong>Two ideas in one:</strong> <code>dict(zip(cols, row))</code> is the idiomatic rows→records move, and <code>default=str</code> is the quick fix for non-serializable types like <code>date</code>/<code>Decimal</code> (a custom encoder is the production-grade version).</p>
       </div></details>
     </div>
@@ -1418,7 +1445,12 @@ def parse_tool_calls(response):
             errors.append({'index': i, 'error': str(e)})
     return valid, errors
 
-valid, errors = parse_tool_calls(response)</code></pre>
+valid, errors = parse_tool_calls(response)
+
+# valid  → [{'name': 'reserve_part', 'sku': 'CMP-100', 'quantity': 2}]
+# errors → [{'index': 1, 'error': 'sku and positive integer quantity required'},
+#           {'index': 2, 'error': 'Expecting value: line 1 column 1 (char 0)'}]
+# (call 0 normalized 'cmp-100'→'CMP-100'; qty 0 and the 'not json' args rejected)</code></pre>
       <p class="note"><strong>Production note:</strong> structured-output APIs help, but boundary validation still belongs in your code because downstream systems need dependable contracts.</p>
       </div></details>
     </div>
@@ -1472,7 +1504,11 @@ def diff_config(old, new, prefix=''):
             diff['changed'].append(path)
     return diff
 
-diff = diff_config(old, new)</code></pre>
+diff = diff_config(old, new)
+
+# → {'added': ['json_mode'], 'removed': [],
+#    'changed': ['model', 'retry.max', 'timeout']}
+# (retry.backoff is unchanged, so it doesn't appear)</code></pre>
       <p class="note"><strong>Expected shape:</strong> comparing retry settings might report <code>retry.max</code> as changed while preserving unchanged siblings like <code>retry.backoff</code>.</p>
       </div></details>
     </div>
@@ -1565,7 +1601,11 @@ limit_by_model.get('ultra', 8192)  # 8192</code></pre>
 # Mixed directions: sort by the secondary key first, then the primary.
 # Python's stable sort preserves newest-first order within each status.
 step1 = sorted(runs, key=lambda r: r['started_at'], reverse=True)
-mixed = sorted(step1, key=lambda r: r['status'])</code></pre>
+mixed = sorted(step1, key=lambda r: r['status'])
+
+# newest → run_ids ['c', 'b', 'a']
+# mixed  → [('failed', 'c'), ('failed', 'a'), ('success', 'b')]
+#          (failed before success; newest-first preserved within each status)</code></pre>
       <p class="note"><strong>Key fact:</strong> Python's sort is <em>stable</em> — equal elements keep their order. Chained sorts (secondary first, primary last) is the clean way to mix ascending/descending. ISO-8601 strings sort correctly as plain strings.</p>
       </div></details>
     </div>
@@ -1594,7 +1634,10 @@ mixed = sorted(step1, key=lambda r: r['status'])</code></pre>
 
 counts = Counter(statuses)
 # Counter({'success': 3, 'failed': 2, 'timeout': 1})
-top_status, top_count = counts.most_common(1)[0]</code></pre>
+top_status, top_count = counts.most_common(1)[0]
+
+# counts → Counter({'success': 3, 'failed': 2, 'timeout': 1})
+# top_status, top_count → ('success', 3)</code></pre>
       <p class="note"><strong>Without imports:</strong> <code>counts = {}</code> then <code>counts[s] = counts.get(s, 0) + 1</code> in a loop. Be ready to write both — some interviewers ask for the no-stdlib version.</p>
       </div></details>
     </div>
@@ -1652,7 +1695,10 @@ responses = ['Yes, 12 units.', '2 business days.']</code></pre>
       <pre><code>records = [
     {'case_id': i, 'prompt': p, 'response': r}
     for i, (p, r) in enumerate(zip(prompts, responses, strict=True))
-]</code></pre>
+]
+
+# records → [{'case_id': 0, 'prompt': 'Is CMP-100 in stock?', 'response': 'Yes, 12 units.'},
+#            {'case_id': 1, 'prompt': 'Ship time to 60601?',  'response': '2 business days.'}]</code></pre>
       <p class="note"><strong>Detail that impresses:</strong> <code>strict=True</code> (Python 3.10+) raises if the lists have different lengths instead of silently truncating — exactly the bug you want to catch in an eval pipeline.</p>
       </div></details>
     </div>
@@ -1722,7 +1768,9 @@ for event in events:
     if key not in latest or event['ts'] &gt; latest[key]['ts']:
         latest[key] = event
 
-list(latest.values())</code></pre>
+list(latest.values())
+# → keeps orders_sync @ 10:05:00 (success) and parts_embed @ 09:00:00 (failed)
+#   one record per pipeline, each the latest ts</code></pre>
       <p class="note"><strong>Alternative:</strong> sort by <code>ts</code> ascending and overwrite <code>latest[key] = event</code> unconditionally — last write wins. Single pass with a comparison avoids the O(n log n) sort.</p>
       </div></details>
     </div>
@@ -1758,7 +1806,10 @@ def batched(items, size):
     for start in range(0, len(items), size):
         yield items[start:start + size]
 
-first_batches = list(batched(part_ids, 3))</code></pre>
+first_batches = list(batched(part_ids, 3))
+
+# part_ids has 6 ids → first_batches →
+# [['CMP-100', 'FAN-220', 'THR-310'], ['VAL-500', 'BRD-720', 'SNS-610']]</code></pre>
       <p class="note"><strong>Edge case to mention:</strong> the final partial batch is included automatically because slicing past the end is safe. Python 3.12+ has <code>itertools.batched</code> built in — naming it earns a point.</p>
       </div></details>
     </div>
@@ -1790,7 +1841,11 @@ for record in erp + ecom:           # later source wins on conflicts
     merged.setdefault(sku, {}).update(record)
 
 result = list(merged.values())
-# A1 → {'sku': 'A1', 'price': 12.5, 'stock': 5}</code></pre>
+# A1 → {'sku': 'A1', 'price': 12.5, 'stock': 5}
+# full result → [{'sku': 'A1', 'price': 12.5, 'stock': 5},
+#                {'sku': 'B2', 'price': 20.0},
+#                {'sku': 'C3', 'price': 8.0}]
+# (A1: ecom price 12.5 wins, ERP stock 5 kept; B2 and C3 appear once each)</code></pre>
       <p class="note"><strong>Key insight:</strong> processing sources in priority order and letting <code>dict.update</code> overwrite gives field-level merge for free. This is a tiny version of a real master-data problem.</p>
       </div></details>
     </div>
@@ -1826,7 +1881,12 @@ result = list(merged.values())
                     f'alias {name!r} claimed by {routing[name]} and {model}'
                 )
             routing[name] = model
-    return routing</code></pre>
+    return routing
+
+# invert(aliases) →
+# {'pro': 'gemini-pro', 'default': 'gemini-pro',
+#  'flash': 'gemini-flash', 'fast': 'gemini-flash'}
+# (a repeated alias across models would raise ValueError instead)</code></pre>
       <p class="note"><strong>Why the collision check:</strong> silent overwrites in routing tables cause "why did my request go to the wrong model" bugs that take hours to find. <code>{n: m for m, ns in aliases.items() for n in ns}</code> works but hides collisions.</p>
       </div></details>
     </div>
@@ -1860,7 +1920,10 @@ unique = []
 for event in events:
     if event['event_id'] not in seen:
         seen.add(event['event_id'])
-        unique.append(event)</code></pre>
+        unique.append(event)
+
+# unique → event_ids ['e1', 'e2']
+# (the second 'e1' is dropped; first-seen order preserved)</code></pre>
       <p class="note"><strong>Why not <code>set(events)</code>:</strong> dicts aren't hashable, and sets don't preserve order anyway. The seen-set loop is O(n) and the standard answer. Bonus trivia: for hashable items, <code>list(dict.fromkeys(xs))</code> dedups in order.</p>
       </div></details>
     </div>
@@ -1908,7 +1971,13 @@ def top_errors(events, n=3):
         for pipeline, rows in grouped.items()
     }
 
-top_by_pipeline = top_errors(events)</code></pre>
+top_by_pipeline = top_errors(events)
+
+# top_by_pipeline →
+#   orders_sync   : HTTP_500 (2), AUTH (1), SCHEMA_MISMATCH (1)
+#   parts_embed   : VECTOR_DIM (2), HTTP_429 (1)
+#   inventory_sync: HTTP_500 (1)
+# (ties broken alphabetically by error_code: AUTH before SCHEMA_MISMATCH)</code></pre>
       <p class="note"><strong>Why this is hard:</strong> it tests composite keys, deterministic sorting, and output shaping without pandas.</p>
       </div></details>
     </div>
@@ -1959,7 +2028,10 @@ def topo_sort(deps):
         visit(name)
     return order
 
-run_order = topo_sort(deps)</code></pre>
+run_order = topo_sort(deps)
+
+# run_order → ['parts_catalog', 'orders_sync', 'parts_embed', 'answer_index', 'daily_eval']
+# (every pipeline appears after its dependencies; a cycle would raise ValueError)</code></pre>
       <p class="note"><strong>Expected:</strong> the fixture can return <code>['parts_catalog', 'orders_sync', 'parts_embed', 'answer_index', 'daily_eval']</code>. Multiple valid orders may exist when nodes are independent.</p>
       </div></details>
     </div>
@@ -2030,7 +2102,11 @@ def to_bool(value):
         return True
     if text in FALSY:
         return False
-    return None</code></pre>
+    return None
+
+# [to_bool(x) for x in ['Yes', 0, True, None, 'maybe']]
+# → [True, False, True, None, None]
+# (real bool passes through; 'maybe' and None are unparseable → None)</code></pre>
       <p class="note"><strong>Gotcha:</strong> check <code>isinstance(value, bool)</code> <em>before</em> anything else — and never use <code>bool('false')</code>, which is <code>True</code> because the string is non-empty.</p>
       </div></details>
     </div>
@@ -2067,7 +2143,11 @@ SENSITIVE = {'email', 'phone', 'tax_id'}
 def scrub(record):
     return {k: v for k, v in record.items() if k not in SENSITIVE}
 
-safe_records = [scrub(r) for r in records]</code></pre>
+safe_records = [scrub(r) for r in records]
+
+# safe_records → email / phone / tax_id stripped; originals untouched
+# [{'customer_id': 'C-100', 'name': 'Northwind HVAC', 'last_order': 'CMP-100'},
+#  {'customer_id': 'C-101', 'name': 'Lakefront Supply', 'last_order': 'FAN-220'}]</code></pre>
       <p class="note"><strong>Talking point:</strong> building a <em>new</em> dict (vs. <code>del record['email']</code>) avoids surprising whoever else holds a reference to the original. Allowlisting fields is even safer than denylisting — say so.</p>
       </div></details>
     </div>
@@ -2103,7 +2183,10 @@ def parse_duration(text):
     try:
         return float(value) * UNIT_TO_SECONDS[unit]
     except ValueError:
-        return None  # e.g. '1.2.3s'</code></pre>
+        return None  # e.g. '1.2.3s'
+
+# [parse_duration(x) for x in ['120ms', '1.5s', '2m', '2m later']]
+# → [0.12, 1.5, 120.0, None]   ('2m later' fails fullmatch → None)</code></pre>
       <p class="note"><strong>Details:</strong> put the longest unit first in the alternation (<code>ms|s|m</code>) so it wins, and use <code>fullmatch</code> (not <code>match</code>) so trailing garbage like <code>'2m later'</code> doesn't sneak through. The inner <code>try</code> catches malformed numbers like <code>'1.2.3'</code> that the character class allows.</p>
       </div></details>
     </div>
@@ -2142,7 +2225,10 @@ def parse_duration(text):
         number = float(text)
     except ValueError:
         return None
-    return number / 100 if is_pct else number</code></pre>
+    return number / 100 if is_pct else number
+
+# [to_number(x) for x in ['$1,249.99', '15%', 'N/A', '']]
+# → [1249.99, 0.15, None, None]   ('15%' → 0.15; blanks and 'N/A' → None)</code></pre>
       <p class="note"><strong>Structure to copy:</strong> handle already-clean types first, normalize the string, then a single <code>try/except ValueError</code> around the actual conversion — not around the whole function.</p>
       </div></details>
     </div>
@@ -2221,7 +2307,11 @@ def split_records(raw_records):
         clean.append({**record, 'price': price})
     return {'clean': clean, 'rejected': rejected}
 
-result = split_records(raw_records)</code></pre>
+result = split_records(raw_records)
+
+# result['clean']  → [{'sku': ' cmp-100 ', 'name': 'Compressor', 'price': 489.0}]
+# rejected reasons → ["missing ['sku']", "missing ['name']", 'bad price']
+# (every input row lands in exactly one bucket)</code></pre>
       <p class="note"><strong>Why this shape:</strong> rejected-with-reason is what makes a pipeline debuggable — you can count rejects by reason, alert on spikes, and replay fixes. Silently dropping rows is how data quietly goes missing.</p>
       </div></details>
     </div>
@@ -2264,7 +2354,10 @@ def map_statuses(records):
         record['status'] = STATUS_MAP.get(code, 'unknown')
     return records, sorted(str(c) for c in unmapped)
 
-mapped_records, unmapped = map_statuses(records)</code></pre>
+mapped_records, unmapped = map_statuses(records)
+
+# mapped   → SHP→shipped, DLV→delivered, RTN→unknown
+# unmapped → ['RTN']   (defaulted, but reported so the mapping stays honest)</code></pre>
       <p class="note"><strong>Operational habit:</strong> defaulting keeps the pipeline flowing; <em>reporting</em> what you defaulted keeps the mapping honest. Log or metric the unmapped set every run.</p>
       </div></details>
     </div>
@@ -2293,7 +2386,10 @@ mapped_records, unmapped = map_statuses(records)</code></pre>
     cut = text.rfind(' ', 0, limit)
     if cut == -1:          # one giant token — hard cut
         cut = limit
-    return text[:cut].rstrip() + '…'</code></pre>
+    return text[:cut].rstrip() + '…'
+
+# truncate('The compressor unit ships in two business days', 25)
+# → 'The compressor unit…'   (cut at the last space that fits, not mid-word)</code></pre>
       <p class="note"><strong>Edge cases to name:</strong> text shorter than the limit, text with no spaces, and trailing punctuation. Real token budgets use a tokenizer, but char-based with a margin is the pragmatic everyday version.</p>
       </div></details>
     </div>
@@ -2352,7 +2448,12 @@ def add_context_text(record):
     return {**record, 'context': ' | '.join(parts)}
 
 steps = [strip_strings, coerce_price, add_context_text]
-clean_records = run_pipeline(records, steps)</code></pre>
+clean_records = run_pipeline(records, steps)
+
+# clean_records →
+#   sku 'cmp-100', price 489.0, context 'SKU: cmp-100 | Name: Compressor | Category: HVAC'
+#   sku 'fan-220', price 75.5,  context 'SKU: fan-220 | Name: Fan Motor'
+# (second row's category is None, so it's skipped in the context string)</code></pre>
       <p class="note"><strong>Why it matters:</strong> a list of small named functions is the no-framework version of a DAG — testable in isolation, reorderable, and easy to explain. The context-string step is exactly how you prep rows for embedding or RAG.</p>
       </div></details>
     </div>
@@ -2435,7 +2536,12 @@ def normalize_part(record, vendor):
 normalized = [
     normalize_part(item['record'], item['vendor'])
     for item in vendor_samples
-]</code></pre>
+]
+
+# normalized →
+#   ({'sku': 'CMP-100', 'name': 'Compressor', 'price': 489.0, 'active': True}, None)
+#   ({'sku': 'FAN-220', 'name': 'Fan Motor',  'price': 75.5,  'active': True}, None)
+# (each vendor's field names mapped to the canonical record; both pass validation)</code></pre>
       <p class="note"><strong>Design point:</strong> mapping tables keep vendor weirdness at the edge. The canonical record is what the rest of the platform should see.</p>
       </div></details>
     </div>
@@ -2496,7 +2602,11 @@ def dedupe_parts(records):
             discarded.append(record.get('id'))
     return [record for _, record in best_by_sku.values()], discarded
 
-kept, discarded_ids = dedupe_parts(records)</code></pre>
+kept, discarded_ids = dedupe_parts(records)
+
+# kept ids      → ['r2', 'r4']
+# discarded_ids → ['r1', 'r3']
+# (CMP-100: r2 is newer; FAN-220: r3/r4 tie on time, r4 wins on completeness)</code></pre>
       <p class="note"><strong>Follow-up:</strong> real survivorship rules should be explicit and logged. Silent dedupe can destroy useful source-system evidence.</p>
       </div></details>
     </div>
@@ -3656,7 +3766,11 @@ def add_tag(record, tags=None):
     if tags is None:
         tags = []
     tags.append(record['category'])
-    return tags</code></pre>
+    return tags
+
+# buggy: add_tag({'category':'HVAC'}) → ['HVAC'],
+#        then add_tag({'category':'Controls'}) → ['HVAC', 'Controls']  (shared!)
+# fixed: same two calls → ['HVAC'] then ['Controls']  (independent lists)</code></pre>
       <p class="note"><strong>Symptom in the wild:</strong> tags from earlier records mysteriously appear on later ones. The <code>None</code>-sentinel pattern is the canonical fix — this is probably the single most-asked Python gotcha.</p>
       </div></details>
     </div>
@@ -3694,7 +3808,10 @@ def add_tag(record, tags=None):
             errors.append(i)
     if errors:
         logger.warning('%d/%d records failed', len(errors), len(records))
-    return results</code></pre>
+    return results
+
+# e.g. 4 records where #2 raises → results [10, 20, 30], failed index [2]
+# (one bad record is logged and skipped; the rest still process)</code></pre>
       <p class="note"><strong>Scope matters:</strong> the <code>try</code> goes <em>inside</em> the loop, around one record's work. Broad <code>except Exception</code> is acceptable exactly here — at a batch boundary, paired with <code>logger.exception</code> so nothing is silently lost.</p>
       </div></details>
     </div>
@@ -3725,7 +3842,10 @@ def add_tag(record, tags=None):
 def avg_latency(latencies):
     if not latencies:
         return None     # or 0.0 — but say which and why
-    return sum(latencies) / len(latencies)</code></pre>
+    return sum(latencies) / len(latencies)
+
+# buggy: avg_latency([]) → ZeroDivisionError
+# fixed: avg_latency([]) → None,  avg_latency([10, 20]) → 15.0</code></pre>
       <p class="note"><strong>The discussion is the point:</strong> <code>None</code> says "no data" (and forces callers to handle it); <code>0.0</code> silently looks like "blazing fast." For metrics, <code>None</code>/NaN is usually right — a dashboard showing 0ms latency on an outage is a lie.</p>
       </div></details>
     </div>
@@ -3757,7 +3877,10 @@ name = (
     (record.get('customer') or {})
     .get('profile', {})
     .get('display_name', 'Unknown')
-)</code></pre>
+)
+
+# record missing 'customer' (or with customer=None) → 'Unknown'
+# (no KeyError, no TypeError)</code></pre>
       <p class="note"><strong>Subtlety:</strong> <code>(x or {})</code> handles the key existing with value <code>None</code> — plain <code>.get('customer', {})</code> doesn't, because the default applies only when the key is <em>missing</em>. Distinguishing those two cases marks real API experience.</p>
       </div></details>
     </div>
@@ -3787,7 +3910,11 @@ name = (
 # skips the element that slid into the removed slot. Two discontinued
 # parts in a row → the second one survives.
 
-parts = [p for p in parts if not p['discontinued']]</code></pre>
+parts = [p for p in parts if not p['discontinued']]
+
+# input A(discontinued), B(discontinued), C(active):
+# buggy in-place .remove() → leaves ['B', 'C']  (B skipped by the iterator!)
+# fixed comprehension      → ['C']</code></pre>
       <p class="note"><strong>Rule:</strong> never mutate a list you're iterating — build a new one (comprehension) or iterate over a copy (<code>for p in parts[:]</code>). The same applies to adding/removing dict keys during iteration, which raises <code>RuntimeError</code> outright.</p>
       </div></details>
     </div>
@@ -3832,7 +3959,10 @@ def sync_orders():
         load_to_warehouse(orders)
     except requests.exceptions.RequestException:
         logger.exception('orders sync failed')   # full traceback
-        raise                                    # let the scheduler see it</code></pre>
+        raise                                    # let the scheduler see it
+
+# behavior: a request failure now logs a full traceback AND re-raises,
+# so the scheduler marks the run failed instead of a silent green.</code></pre>
       <p class="note"><strong>Three sins in the original:</strong> bare <code>except:</code> (even catches <code>KeyboardInterrupt</code>/<code>SystemExit</code>), <code>pass</code> (no log, no metric, no alert), and swallowing instead of re-raising (the orchestrator marks the run green). Silent failure is worse than a crash — a crash gets fixed.</p>
       </div></details>
     </div>
@@ -3879,7 +4009,11 @@ parts_clean = (parts.sort_values('updated_at')
 
 # Guard so it never silently happens again
 enriched = orders.merge(parts_clean, on='sku',
-                        how='left', validate='many_to_one')</code></pre>
+                        how='left', validate='many_to_one')
+
+# buggy: len(orders)=10 → len(enriched)=11  (CMP-100 is duplicated in the lookup)
+# duplicate keys → ['CMP-100', 'CMP-100']
+# fixed: dedup + validate='many_to_one' → len=10 (and raises if dups ever return)</code></pre>
       <p class="note"><strong>The gem:</strong> <code>validate='many_to_one'</code> makes pandas raise the moment the right side has duplicate keys. Doubled metrics after a join is one of the most common real data incidents — having a crisp story for it plays very well.</p>
       </div></details>
     </div>
@@ -3919,7 +4053,11 @@ active = df[df['status'] == 'active'].copy()
 active['priority'] = 'high'
 
 # If you want to update the original in place:
-df.loc[df['status'] == 'active', 'priority'] = 'high'</code></pre>
+df.loc[df['status'] == 'active', 'priority'] = 'high'
+
+# buggy: active['priority'] = 'high' on a filtered slice → SettingWithCopyWarning
+# fixed: .loc writes straight to the original → 9 of 10 rows set to 'high'
+#        (GSK-940 is inactive, so it's left unchanged)</code></pre>
       <p class="note"><strong>Decide first:</strong> are you modifying the original or working on a subset? <code>.copy()</code> for a subset, single <code>.loc[mask, col] = value</code> for the original. (pandas 3.x copy-on-write makes the chained version simply not write — the explicit forms are correct under both.)</p>
       </div></details>
     </div>
@@ -3956,7 +4094,10 @@ df.loc[df['status'] == 'active', 'priority'] = 'high'</code></pre>
 class Connector:
     def __init__(self, name):
         self.name = name
-        self.errors = []       # instance attribute — per connector</code></pre>
+        self.errors = []       # instance attribute — per connector
+
+# buggy: a.record_error('x'); then b.errors → ['x']  (one shared list!)
+# fixed: a.record_error('x'); then b.errors → []     (each instance its own)</code></pre>
       <p class="note"><strong>Mechanism:</strong> attribute lookup finds <code>errors</code> on the class when the instance has none; <code>append</code> mutates in place so no instance attribute is ever created. (Assignment like <code>self.errors = [...]</code> <em>would</em> create one — that's why the bug only bites mutable defaults.) Same root cause as problem 7.1.</p>
       </div></details>
     </div>
@@ -4004,7 +4145,11 @@ cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
 def parse_ts(text):
     return datetime.fromisoformat(text.replace('Z', '+00:00'))
 
-recent = [r for r in records if parse_ts(r['created_at']) &gt; cutoff]</code></pre>
+recent = [r for r in records if parse_ts(r['created_at']) &gt; cutoff]
+
+# buggy: datetime.now() (naive local) vs aware created_at → TypeError
+# fixed: all comparisons are UTC-aware and run cleanly
+#        (returns [] here — both sample rows are older than 24h as of 2026-06-14)</code></pre>
       <p class="note"><strong>House rule to state:</strong> everything is UTC and timezone-aware inside the pipeline; convert to local time only at display. Also worth knowing: <code>datetime.utcnow()</code> is deprecated <em>and</em> returns a naive value — <code>datetime.now(timezone.utc)</code> is the modern call.</p>
       </div></details>
     </div>
@@ -4052,7 +4197,11 @@ def encode(obj):
         return float(obj)      # or str, if exactness matters
     raise TypeError(f'not serializable: {type(obj)}')
 
-json.dumps(row, default=encode)</code></pre>
+json.dumps(row, default=encode)
+
+# default=str → {"sku": "CMP-100", "updated_at": "2026-06-11 14:00:00", "price": "489.00"}
+# encoder     → {"sku": "CMP-100", "updated_at": "2026-06-11T14:00:00", "price": 489.0}
+# (the encoder gives ISO datetime and a real number; default=str stringifies both)</code></pre>
       <p class="note"><strong>Why the explicit version:</strong> <code>default=str</code> happily stringifies things you <em>didn't</em> anticipate (sets, custom objects) into junk. The explicit encoder converts the known cases and still fails loudly on surprises — and the Decimal→float choice is a precision decision worth flagging for money.</p>
       </div></details>
     </div>
@@ -4090,7 +4239,10 @@ def daily_load():
 # Option 2: upsert on a natural key
 def daily_load():
     for order in fetch_orders(date=today()):
-        upsert(order, key='order_id')   # MERGE in SQL terms</code></pre>
+        upsert(order, key='order_id')   # MERGE in SQL terms
+
+# behavior: running the fixed load once or five times leaves the same rows.
+# buggy plain INSERT would duplicate the day's data on every rerun.</code></pre>
       <p class="note"><strong>Why interviewers ask this:</strong> retries are everywhere — schedulers, humans, network blips — so non-idempotent jobs <em>will</em> duplicate data eventually. Delete+insert suits partitioned batch loads (BigQuery's <code>WRITE_TRUNCATE</code> on a partition); MERGE/upsert suits incremental streams. Naming both, and when each fits, is the strong answer.</p>
       </div></details>
     </div>
@@ -4128,7 +4280,11 @@ for field in ['sku', 'name', 'price']:
 def required_field(field):
     return lambda record: field in record
 
-validators = [required_field(f) for f in ['sku', 'name', 'price']]</code></pre>
+validators = [required_field(f) for f in ['sku', 'name', 'price']]
+
+# on record {'sku': 1}:
+# buggy → [False, False, False]  (every lambda closed over the final 'price')
+# fixed → [True, False, False]   (each validator checks its own field)</code></pre>
       <p class="note"><strong>Real-world version:</strong> this shows up in callback registration, Airflow task factories, and dynamic validator construction.</p>
       </div></details>
     </div>
@@ -4173,7 +4329,11 @@ def get_with_retry(url, attempts=3):
         except requests.exceptions.RequestException as e:
             last_error = e
             logger.warning('attempt %d/%d failed: %s', attempt, attempts, e)
-    raise RuntimeError(f'all {attempts} attempts failed') from last_error</code></pre>
+    raise RuntimeError(f'all {attempts} attempts failed') from last_error
+
+# when every attempt fails:
+# buggy → returns None  (caller can't tell success from failure)
+# fixed → raises RuntimeError('all 3 attempts failed')</code></pre>
       <p class="note"><strong>Second bug:</strong> the original never calls <code>raise_for_status()</code>, so HTTP 500 with a JSON error body could be treated as a successful payload.</p>
       </div></details>
     </div>
