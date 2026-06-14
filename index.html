@@ -394,7 +394,7 @@ details.solution[open] summary { border-bottom: 1.5px dashed var(--line-strong);
       <span class="p-num">1.1</span><h3>Build a DataFrame from records</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>You pulled parts data from an internal service as a list of dicts. Build a DataFrame and inspect its shape, column names, and dtypes.</p>
+      <p>Practice task: convert the list of part dictionaries into a pandas DataFrame named <code>df</code>. Then inspect the resulting table by checking its shape, column names, data types, and first few rows.</p>
       <pre><code>parts = [
     {'sku': 'CMP-100', 'name': 'Compressor', 'price': 489.0, 'stock': 12},
     {'sku': 'FAN-220', 'name': 'Fan Motor', 'price': 75.5, 'stock': 0},
@@ -429,7 +429,7 @@ df.head()</code></pre>
       <span class="p-num">1.2</span><h3>Filter rows and select columns</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Load the parts catalog and return only the <code>sku</code> and <code>price</code> of parts that cost more than $100 <em>and</em> have stock available.</p>
+      <p>Practice task: load the parts catalog, filter to parts where <code>price &gt; 100</code> and <code>stock &gt; 0</code>, and return only the <code>sku</code> and <code>price</code> columns.</p>
       <pre><code>import pandas as pd
 
 df = pd.read_csv('data/parts.csv')</code></pre>
@@ -458,7 +458,7 @@ result = df.loc[(df['price'] &gt; 100) &amp; (df['stock'] &gt; 0), ['sku', 'pric
       <span class="p-num">1.3</span><h3>Derive a new column</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Load the parts catalog, then add a <code>margin_pct</code> column: <code>(price - cost) / price</code>, rounded to 2 decimals.</p>
+      <p>Practice task: load the parts catalog and create a new column named <code>margin_pct</code>. For each row, calculate <code>(price - cost) / price</code> and round the result to 2 decimal places.</p>
       <pre><code>import pandas as pd
 
 df = pd.read_csv('data/parts.csv')</code></pre>
@@ -487,7 +487,7 @@ df['margin_pct'] = ((df['price'] - df['cost']) / df['price']).round(2)</code></p
       <span class="p-num">1.4</span><h3>Count values in a column</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Load the parts catalog. How many parts are in each <code>category</code>? Also show each category's share as a percentage of the whole catalog.</p>
+      <p>Practice task: load the parts catalog and summarize the <code>category</code> column two ways: raw count per category and each category's percentage share of the full catalog.</p>
       <pre><code>import pandas as pd
 
 df = pd.read_csv('data/parts.csv')</code></pre>
@@ -517,7 +517,7 @@ share = df['category'].value_counts(normalize=True).mul(100).round(1)</code></pr
       <span class="p-num">1.5</span><h3>Audit and handle missing values</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Load the messy upstream sync extract: (a) count nulls per column, (b) drop rows missing <code>sku</code>, (c) fill missing <code>warehouse</code> with <code>'UNASSIGNED'</code>.</p>
+      <p>Practice task: load the messy upstream sync extract, produce a null-count report for every column, remove rows that do not have a <code>sku</code>, and replace missing <code>warehouse</code> values with <code>'UNASSIGNED'</code>.</p>
       <pre><code>import pandas as pd
 
 df = pd.read_csv('data/parts_sync.csv')</code></pre>
@@ -549,7 +549,7 @@ df['warehouse'] = df['warehouse'].fillna('UNASSIGNED')</code></pre>
       <span class="p-num">1.6</span><h3>Group and aggregate</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Load the parts catalog. Per <code>warehouse</code>, compute total units in stock and the average part price — with readable output column names.</p>
+      <p>Practice task: load the parts catalog and return one summary row per <code>warehouse</code>. Include total stock units and average price, using clear output column names such as <code>total_stock</code> and <code>avg_price</code>.</p>
       <pre><code>import pandas as pd
 
 df = pd.read_csv('data/parts.csv')</code></pre>
@@ -583,7 +583,7 @@ summary = (
       <span class="p-num">1.7</span><h3>Datetime parsing and daily counts</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load the order extract. Parse the string timestamps in <code>created_at</code>, keep only the last 7 days, and produce a count of orders per day.</p>
+      <p>Practice task: load the order extract, convert <code>created_at</code> from strings to timezone-aware datetimes, keep only orders from the last 7 days, and count how many orders occurred on each day.</p>
       <pre><code>import pandas as pd
 
 orders = pd.read_csv('data/orders.csv')</code></pre>
@@ -621,7 +621,7 @@ daily = (
       <span class="p-num">1.8</span><h3>Join two tables and find orphans</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load the orders and parts catalog extracts. Merge <code>orders</code> with <code>parts</code> on <code>sku</code>, keeping all orders. Then list the orders that reference a SKU that doesn't exist in the catalog.</p>
+      <p>Practice task: load the orders and parts catalog extracts, left join <code>orders</code> to <code>parts</code> on <code>sku</code>, and identify the order rows whose SKU did not match any catalog row.</p>
       <pre><code>import pandas as pd
 
 orders = pd.read_csv('data/orders.csv')
@@ -656,7 +656,7 @@ merged = merged.drop(columns='_merge')</code></pre>
       <span class="p-num">1.9</span><h3>Pivot to a matrix view</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load the order extract. From rows with <code>warehouse</code>, <code>priority</code> (<code>'standard'</code> / <code>'rush'</code>), and <code>fulfillment_hours</code>, build a table with warehouses as rows, priorities as columns, and average fulfillment hours as values.</p>
+      <p>Practice task: load the order extract and reshape it into a warehouse-by-priority table. Rows should be <code>warehouse</code>, columns should be <code>priority</code>, and each cell should contain the average <code>fulfillment_hours</code>.</p>
       <pre><code>import pandas as pd
 
 df = pd.read_csv('data/orders.csv')</code></pre>
@@ -690,7 +690,7 @@ matrix = df.pivot_table(
       <span class="p-num">1.10</span><h3>Top-N per group</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load the part revenue extract and find the 3 highest-revenue parts <em>within each category</em> (columns: <code>category</code>, <code>sku</code>, <code>revenue</code>).</p>
+      <p>Practice task: load the part revenue extract and return the top 3 rows by <code>revenue</code> inside each <code>category</code>. Keep the identifying columns: <code>category</code>, <code>sku</code>, and <code>revenue</code>.</p>
       <pre><code>import pandas as pd
 
 df = pd.read_csv('data/part_revenue.csv')</code></pre>
@@ -723,7 +723,7 @@ top3 = (
       <span class="p-num">1.11</span><h3>Export a DataFrame as JSON-safe records</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load the API export extract. It has a datetime column and some blank fields that become NaNs — both of which can break strict <code>json.dumps</code>. Produce clean, JSON-serializable records.</p>
+      <p>Practice task: load the API export extract and convert it into a list of records that can be safely passed to strict <code>json.dumps</code>. Convert datetimes to strings and replace pandas missing values with <code>None</code>.</p>
       <pre><code>import pandas as pd
 
 df = pd.read_csv('data/parts_api_export.csv', parse_dates=['updated_at'])</code></pre>
@@ -757,7 +757,7 @@ records = out.to_dict(orient='records')</code></pre>
       <span class="p-num">1.12</span><h3>Write a DataFrame validator</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load the quality-check fixture and validate it before publishing for AI use: required columns exist, <code>sku</code> has no duplicates, and <code>price</code> is non-negative. Return a list of human-readable issues (empty list = passes).</p>
+      <p>Practice task: load the quality-check fixture and write a validator for the DataFrame. It should confirm required columns exist, <code>sku</code> values are unique, and <code>price</code> is never negative. Return a list of readable issue messages; return an empty list when the data passes.</p>
       <pre><code>import pandas as pd
 
 df = pd.read_csv('data/parts_quality.csv')</code></pre>
@@ -806,7 +806,7 @@ issues = validate_parts(df)</code></pre>
       <span class="p-num">1.13</span><h3>Reconcile demand against inventory</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Load the order and inventory extracts. Using <code>orders</code> with <code>sku</code>, <code>qty_ordered</code>, and <code>order_date</code>, plus an <code>inventory</code> table with one row per <code>sku</code> and <code>on_hand</code>, produce a shortage report for the last 30 days. Include total demand, on-hand quantity, shortage quantity, and a flag for SKUs missing from inventory.</p>
+      <p>Practice task: load the order and inventory extracts and build a shortage report for the last 30 days, filtering orders on their <code>order_date</code>. First total <code>qty_ordered</code> per <code>sku</code>, then join to the inventory table (one row per <code>sku</code>, carrying <code>on_hand</code>), and include <code>total_demand</code>, <code>on_hand</code>, <code>shortage_qty</code>, and a flag showing whether the SKU was missing from inventory.</p>
       <pre><code>import pandas as pd
 
 orders = pd.read_csv('data/orders.csv')
@@ -858,7 +858,7 @@ report = report.drop(columns='_merge')</code></pre>
       <span class="p-num">1.14</span><h3>Build daily SLA metrics from events</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Load the warehouse event extract. From rows with <code>warehouse</code>, <code>created_at</code>, <code>completed_at</code>, and <code>status</code>, compute daily metrics per warehouse: completed jobs, failed jobs, average completion minutes, and p95 completion minutes. Days with no events should appear with zeros for counts.</p>
+      <p>Practice task: load the warehouse event extract — each row has <code>warehouse</code>, <code>created_at</code>, <code>completed_at</code>, and <code>status</code> — and produce one metrics row per warehouse per day. Calculate completed jobs, failed jobs, average completion minutes (the gap from <code>created_at</code> to <code>completed_at</code> on completed rows), and p95 completion minutes. Include dates with no events, using zero for the count columns on those dates.</p>
       <pre><code>import pandas as pd
 
 events = pd.read_csv('data/events.csv')</code></pre>
@@ -916,7 +916,7 @@ daily[['completed_jobs', 'failed_jobs']] = daily[['completed_jobs', 'failed_jobs
       <span class="p-num">2.1</span><h3>Parse a JSON string and read a nested field</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>An LLM API returned this raw body as a string. Parse it and print the total token count.</p>
+      <p>Practice task: an LLM API returned this response body as a JSON string. Parse the string into Python data and print the nested <code>total_tokens</code> value.</p>
       <pre><code>raw = '{"model": "gpt-x", "usage": {"prompt_tokens": 412, "completion_tokens": 88, "total_tokens": 500}}'</code></pre>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Parse the string first; nested indexing only works after it is a Python dict.</p>
@@ -944,7 +944,7 @@ print(body['usage']['total_tokens'])  # 500</code></pre>
       <span class="p-num">2.2</span><h3>Serialize a dict for humans and for machines</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Load the model-routing config from the LLM payload fixture, then produce (a) a pretty, key-sorted string for logging and (b) a compact string for sending over the wire.</p>
+      <p>Practice task: load the model-routing config from the LLM payload fixture. Produce two JSON strings from the same dict: a pretty, sorted version for logs and a compact version for network payloads.</p>
       <pre><code>import json
 
 with open('data/llm_payloads.json') as f:
@@ -977,7 +977,7 @@ compact = json.dumps(config, separators=(',', ':'))</code></pre>
       <span class="p-num">2.3</span><h3>Extract the message from a chat response</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Pull the assistant's text out of this chat-completion-style response. Handle the case where <code>choices</code> is empty by returning <code>None</code>.</p>
+      <p>Practice task: write a helper that extracts the assistant message text from this chat-completion-style response. If <code>choices</code> is missing, <code>None</code>, or empty, return <code>None</code> instead of raising.</p>
       <pre><code>response = {
     'id': 'resp-991',
     'choices': [
@@ -1010,7 +1010,7 @@ compact = json.dumps(config, separators=(',', ':'))</code></pre>
       <span class="p-num">2.4</span><h3>Safe nested lookup by dotted path</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Write <code>get_nested(data, 'usage.tokens.total', default=None)</code> that walks a dotted path through nested dicts and never raises — returning the default if any level is missing or not a dict.</p>
+      <p>Practice task: write <code>get_nested(data, path, default=None)</code>. It should walk a dotted path such as <code>'usage.tokens.total'</code> through nested dictionaries and return <code>default</code> if any key is missing or any intermediate value is not a dict.</p>
       <pre><code>data = {'usage': {'tokens': {'total': 500}}, 'model': 'flash'}</code></pre>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Walk one path segment at a time and bail out as soon as the current value stops being a dict.</p>
@@ -1046,7 +1046,7 @@ get_nested(data, 'usage.cost.usd', 0)       # 0</code></pre>
       <span class="p-num">2.5</span><h3>Flatten nested JSON to dotted keys</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Flatten arbitrarily nested dicts into a single level with dotted keys — handy for loading semi-structured payloads into a warehouse table.</p>
+      <p>Practice task: write a function that flattens nested dictionaries into one dictionary with dotted keys. Keep non-dict values as the final values.</p>
       <pre><code>{'model': 'gemini', 'limits': {'rpm': 60, 'retry': {'max': 3}}}
 # becomes
 {'model': 'gemini', 'limits.rpm': 60, 'limits.retry.max': 3}</code></pre>
@@ -1081,7 +1081,7 @@ get_nested(data, 'usage.cost.usd', 0)       # 0</code></pre>
       <span class="p-num">2.6</span><h3>Index an embeddings response by id</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>An embeddings endpoint returned vectors for a batch of part descriptions. Build a <code>{part_id: vector}</code> dict, and raise if any vector has the wrong dimension.</p>
+      <p>Practice task: convert the embeddings API response into a lookup shaped like <code>{part_id: vector}</code>. While building it, validate every vector length and raise a clear error if any vector does not match <code>EXPECTED_DIM</code>.</p>
       <pre><code>response = {
     'data': [
         {'id': 'CMP-100', 'embedding': [0.12, -0.40, 0.77]},
@@ -1122,7 +1122,7 @@ vectors = index_embeddings(response, EXPECTED_DIM)</code></pre>
       <span class="p-num">2.7</span><h3>Parse JSON Lines, skipping bad rows</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>The JSONL export at <code>data/jsonl_export.jsonl</code> has one JSON object per line, but one line is corrupted. Parse what you can; collect <code>(line_number, error)</code> for the rest.</p>
+      <p>Practice task: read <code>data/jsonl_export.jsonl</code> one line at a time. Return valid JSON objects in one list and collect <code>(line_number, error)</code> tuples for lines that cannot be parsed.</p>
       <pre><code>path = 'data/jsonl_export.jsonl'</code></pre>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Process line by line so one corrupted row does not discard the usable rows.</p>
@@ -1161,7 +1161,7 @@ def parse_jsonl(path):
       <span class="p-num">2.8</span><h3>Parse JSON out of an LLM's markdown reply</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>You asked a model for JSON, and it replied with the JSON wrapped in a markdown code fence (a classic). Extract and parse it; return <code>None</code> if no valid JSON is found.</p>
+      <p>Practice task: extract JSON from an LLM reply that may wrap the JSON in a markdown code fence. Parse the extracted JSON and return the Python object; return <code>None</code> if no valid JSON can be parsed.</p>
       <pre><code>reply = '''Sure! Here is the data:
 ```json
 {"sku": "CMP-100", "in_stock": true}
@@ -1197,7 +1197,7 @@ def parse_llm_json(text):
       <span class="p-num">2.9</span><h3>Merge a config override into defaults</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Merge an environment-specific override into a default config. Nested dicts should merge recursively; other values in the override should win.</p>
+      <p>Practice task: merge an environment-specific override into a default config. When both values are dictionaries, merge them recursively; for all other values, the override value should replace the default.</p>
       <pre><code>defaults = {'timeout': 30, 'retry': {'max': 3, 'backoff': 2}, 'verbose': False}
 override = {'retry': {'max': 5}, 'verbose': True}
 # expected: {'timeout': 30, 'retry': {'max': 5, 'backoff': 2}, 'verbose': True}</code></pre>
@@ -1231,7 +1231,7 @@ override = {'retry': {'max': 5}, 'verbose': True}
       <span class="p-num">2.10</span><h3>Rows + schema → JSON records</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>A warehouse client returned column names and rows separately (the shape many DB drivers give you). Convert to a list of dicts and serialize to JSON — dates included.</p>
+      <p>Practice task: convert separate <code>columns</code> and <code>rows</code> from a database-style result into a list of dictionaries, then serialize those records to JSON while handling <code>date</code> values.</p>
       <pre><code>import datetime
 
 columns = ['sku', 'sold_on', 'units']
@@ -1273,7 +1273,7 @@ payload = json.dumps(records, default=str)</code></pre>
       <span class="p-num">2.11</span><h3>Validate tool calls from an LLM response</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Load the model tool-call response from the LLM payload fixture. Each call should have a <code>name</code> and JSON <code>arguments</code> with <code>sku</code> and positive integer <code>quantity</code>. Return valid normalized calls and collect errors by call index.</p>
+      <p>Practice task: load the model tool-call response from the LLM payload fixture and validate each call. Valid calls need a <code>name</code> and JSON arguments containing <code>sku</code> plus a positive integer <code>quantity</code>. Return normalized valid calls and a separate list of errors keyed by call index.</p>
       <pre><code>import json
 
 with open('data/llm_payloads.json') as f:
@@ -1325,7 +1325,7 @@ valid, errors = parse_tool_calls(response)</code></pre>
       <span class="p-num">2.12</span><h3>Deep diff two JSON configs</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Load <code>old_config</code> and <code>new_config</code> from the LLM payload fixture. Write <code>diff_config(old, new)</code> that returns dotted paths for keys that were added, removed, or changed between two nested dict configs. Values that are dicts should be compared recursively.</p>
+      <p>Practice task: load <code>old_config</code> and <code>new_config</code> from the LLM payload fixture. Write <code>diff_config(old, new)</code> that returns three lists of dotted paths: keys added, keys removed, and keys whose values changed. Recurse into nested dictionaries before deciding a whole branch changed.</p>
       <pre><code>import json
 
 with open('data/llm_payloads.json') as f:
@@ -1385,7 +1385,7 @@ diff = diff_config(old, new)</code></pre>
       <span class="p-num">3.1</span><h3>Filter and transform with a comprehension</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Given request latencies in milliseconds, return the slow ones (&gt; 800ms) converted to seconds, in one expression.</p>
+      <p>Practice task: from the list of request latencies in milliseconds, build a new list containing only values greater than 800 ms, converted to seconds. Do it with one list comprehension.</p>
       <pre><code>latencies_ms = [120, 950, 430, 1800, 805, 90]</code></pre>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Filter and transform in one pass: keep only slow latencies, then convert units.</p>
@@ -1411,7 +1411,7 @@ diff = diff_config(old, new)</code></pre>
       <span class="p-num">3.2</span><h3>Build a lookup with a dict comprehension</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Turn a list of <code>(model_name, token_limit)</code> tuples into a dict, then look up a model with a default of 8192 when it's unknown.</p>
+      <p>Practice task: turn the list of <code>(model_name, token_limit)</code> tuples into a dictionary keyed by model name. Then read the limit for an unknown model using <code>8192</code> as the fallback.</p>
       <pre><code>limits = [('flash', 32000), ('pro', 128000), ('nano', 4096)]</code></pre>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>A list of key-value pairs can already become a dictionary directly.</p>
@@ -1439,7 +1439,7 @@ limit_by_model.get('ultra', 8192)  # 8192</code></pre>
       <span class="p-num">3.3</span><h3>Sort records by a field</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Sort pipeline runs by <code>started_at</code>, newest first. Then: sort by <code>status</code> ascending and, within each status, newest first.</p>
+      <p>Practice task: sort the pipeline run records two ways. First, order all runs by <code>started_at</code> newest first. Second, order by <code>status</code> ascending, with runs inside each status still ordered newest first.</p>
       <pre><code>runs = [
     {'run_id': 'a', 'status': 'failed',  'started_at': '2026-06-10T09:00:00'},
     {'run_id': 'b', 'status': 'success', 'started_at': '2026-06-11T09:00:00'},
@@ -1451,17 +1451,14 @@ limit_by_model.get('ultra', 8192)  # 8192</code></pre>
       </div></details>
 
       <details class="solution"><summary>Hint #2</summary><div class="sol-body">
-      <p>Use <code>sorted(..., key=lambda r: ...)</code>; for mixed directions, sort by secondary first, then primary.</p>
+      <p>Use <code>sorted(..., key=lambda r: ...)</code>. For the mixed-direction sort, sort by the secondary key first (<code>started_at</code> newest first), then by the primary key (<code>status</code> ascending).</p>
 
       </div></details>
       <details class="solution"><summary>Solution</summary><div class="sol-body">
       <pre><code>newest = sorted(runs, key=lambda r: r['started_at'], reverse=True)
 
-by_status = sorted(runs, key=lambda r: (r['status'], r['started_at']))
-by_status_newest = sorted(
-    runs, key=lambda r: (r['status'], r['started_at']), reverse=False
-)
-# mixed directions: sort by the secondary key first, then the primary (stable sort)
+# Mixed directions: sort by the secondary key first, then the primary.
+# Python's stable sort preserves newest-first order within each status.
 step1 = sorted(runs, key=lambda r: r['started_at'], reverse=True)
 mixed = sorted(step1, key=lambda r: r['status'])</code></pre>
       <p class="note"><strong>Key fact:</strong> Python's sort is <em>stable</em> — equal elements keep their order. Chained sorts (secondary first, primary last) is the clean way to mix ascending/descending. ISO-8601 strings sort correctly as plain strings.</p>
@@ -1475,7 +1472,7 @@ mixed = sorted(step1, key=lambda r: r['status'])</code></pre>
       <span class="p-num">3.4</span><h3>Count occurrences</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Count job statuses and report the most common one.</p>
+      <p>Practice task: count how many times each job status appears, then extract the single most common status and its count.</p>
       <pre><code>statuses = ['success', 'failed', 'success', 'success', 'timeout', 'failed']</code></pre>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>This is a frequency-count problem with one obvious standard-library helper.</p>
@@ -1504,7 +1501,7 @@ top_status, top_count = counts.most_common(1)[0]</code></pre>
       <span class="p-num">3.5</span><h3>Diff two id sets</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>After a sync job, you have ids in the source system and ids in the target. Find: ids missing from the target, ids only in the target (stale), and ids in both.</p>
+      <p>Practice task: compare source IDs to target IDs after a sync. Produce three sets: IDs missing from the target, IDs that exist only in the target and may be stale, and IDs shared by both systems.</p>
       <pre><code>source_ids = [101, 102, 103, 104]
 target_ids = [102, 103, 105]</code></pre>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
@@ -1534,7 +1531,7 @@ in_both = src &amp; tgt        # {102, 103}</code></pre>
       <span class="p-num">3.6</span><h3>Pair two parallel lists into records</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>You have parallel lists of prompts and model responses from an eval run. Zip them into a list of dicts with an index.</p>
+      <p>Practice task: combine the parallel prompt and response lists into a list of dictionaries. Each output record should include a generated <code>case_id</code>, the prompt, and the matching response at the same position.</p>
       <pre><code>prompts = ['Is CMP-100 in stock?', 'Ship time to 60601?']
 responses = ['Yes, 12 units.', '2 business days.']</code></pre>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
@@ -1562,7 +1559,7 @@ responses = ['Yes, 12 units.', '2 business days.']</code></pre>
       <span class="p-num">3.7</span><h3>Group records by key</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Group pipeline runs by pipeline name into <code>{name: [runs...]}</code> without using pandas.</p>
+      <p>Practice task: group the run records by their <code>pipeline</code> value without using pandas. Return a dictionary shaped like <code>{pipeline_name: [matching_run_records...]}</code>.</p>
       <pre><code>runs = [
     {'pipeline': 'orders_sync', 'run_id': 1},
     {'pipeline': 'parts_embed', 'run_id': 2},
@@ -1598,7 +1595,7 @@ dict(by_pipeline)
       <span class="p-num">3.8</span><h3>Latest record per key</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>From a stream of run events (unsorted), keep only the latest event per pipeline based on <code>ts</code>.</p>
+      <p>Practice task: from the unsorted run events, keep only one record per pipeline — the event with the latest <code>ts</code> value — and return the surviving events as a list.</p>
       <pre><code>events = [
     {'pipeline': 'orders_sync', 'ts': '2026-06-11T10:00:00', 'status': 'running'},
     {'pipeline': 'orders_sync', 'ts': '2026-06-11T10:05:00', 'status': 'success'},
@@ -1632,7 +1629,7 @@ list(latest.values())</code></pre>
       <span class="p-num">3.9</span><h3>Batch a large list with a generator</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load part IDs from the pipeline fixture. Write a generator that yields successive batches for an enrichment API that accepts at most 100 ids per call.</p>
+      <p>Practice task: load part IDs from the pipeline fixture and write a generator that yields consecutive ID batches. Each yielded batch must contain at most 100 IDs so it can be sent to an enrichment API.</p>
       <pre><code>import json
 
 with open('data/pipeline_runs.json') as f:
@@ -1668,7 +1665,7 @@ first_batches = list(batched(part_ids, 3))</code></pre>
       <span class="p-num">3.10</span><h3>Merge two record lists by id</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Merge ERP records with e-commerce records on <code>sku</code>. Where both systems have a field, the e-commerce value wins. Include skus that exist in only one system.</p>
+      <p>Practice task: merge ERP records and e-commerce records by <code>sku</code>. Return one record per SKU, include SKUs that appear in only one source, and let e-commerce field values overwrite ERP values when both sources provide the same field.</p>
       <pre><code>erp = [{'sku': 'A1', 'price': 10.0, 'stock': 5}, {'sku': 'B2', 'price': 20.0}]
 ecom = [{'sku': 'A1', 'price': 12.5}, {'sku': 'C3', 'price': 8.0}]</code></pre>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
@@ -1700,7 +1697,7 @@ result = list(merged.values())
       <span class="p-num">3.11</span><h3>Invert a one-to-many mapping</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>You map internal model names to their accepted aliases. Invert it to <code>alias → model</code> for fast routing, and raise if two models claim the same alias.</p>
+      <p>Practice task: invert the model alias mapping into a routing dictionary shaped like <code>{alias: model_name}</code>. If two models claim the same alias, raise an error instead of silently overwriting the first route.</p>
       <pre><code>aliases = {
     'gemini-pro': ['pro', 'default'],
     'gemini-flash': ['flash', 'fast'],
@@ -1736,7 +1733,7 @@ result = list(merged.values())
       <span class="p-num">3.12</span><h3>Order-preserving dedup</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>A webhook delivered some events more than once. Remove duplicates by <code>event_id</code>, keeping the <em>first</em> occurrence and the original order.</p>
+      <p>Practice task: remove duplicate webhook events by <code>event_id</code>. Keep the first occurrence of each ID and preserve the original order of the remaining records.</p>
       <pre><code>events = [
     {'event_id': 'e1', 'type': 'order.created'},
     {'event_id': 'e2', 'type': 'order.shipped'},
@@ -1771,7 +1768,7 @@ for event in events:
       <span class="p-num">3.13</span><h3>Top error signatures per pipeline</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Load log events from the pipeline fixture. Given records with <code>pipeline</code>, <code>error_code</code>, and <code>message</code>, return the top 3 error codes per pipeline with counts. Ties should sort by error code alphabetically for deterministic output.</p>
+      <p>Practice task: load log events from the pipeline fixture and summarize error codes per pipeline. Return the top 3 <code>error_code</code> values for each <code>pipeline</code>, including counts, and sort ties alphabetically by error code for deterministic output.</p>
       <pre><code>import json
 
 with open('data/pipeline_runs.json') as f:
@@ -1818,7 +1815,7 @@ top_by_pipeline = top_errors(events)</code></pre>
       <span class="p-num">3.14</span><h3>Order pipelines by dependencies</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Load the pipeline dependency map from the fixture. Return a valid run order and raise if there is a cycle.</p>
+      <p>Practice task: load the pipeline dependency map from the fixture and return a valid execution order where every dependency appears before the pipeline that depends on it. If the dependency graph contains a cycle, raise an error.</p>
       <pre><code>import json
 
 with open('data/pipeline_runs.json') as f:
@@ -1875,7 +1872,7 @@ run_order = topo_sort(deps)</code></pre>
       <span class="p-num">4.1</span><h3>Normalize messy identifiers</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Source systems send table names with random casing and spacing. Normalize each: trim, lowercase, internal whitespace → single underscore.</p>
+      <p>Practice task: normalize each source-system table name into a consistent identifier. For every string, trim outer whitespace, lowercase it, and replace any run of internal whitespace with a single underscore.</p>
       <pre><code>names = ['  Daily Orders ', 'parts_CATALOG', 'Vendor  Feed']</code></pre>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Normalize casing and whitespace in a predictable order: trim, lowercase, collapse spaces.</p>
@@ -1904,7 +1901,7 @@ run_order = topo_sort(deps)</code></pre>
       <span class="p-num">4.2</span><h3>Coerce messy booleans</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>A vendor feed represents flags as <code>'Y'</code>, <code>'yes'</code>, <code>'TRUE'</code>, <code>'1'</code>, <code>'N'</code>, <code>'no'</code>, <code>'false'</code>, <code>'0'</code>, or sometimes a real bool or <code>None</code>. Write <code>to_bool(value)</code> that returns <code>True</code>, <code>False</code>, or <code>None</code> (unparseable).</p>
+      <p>Practice task: write <code>to_bool(value)</code> to normalize vendor flag values. Return <code>True</code> for common truthy strings (<code>'y'</code>, <code>'yes'</code>, <code>'true'</code>, <code>'1'</code>), <code>False</code> for their falsy counterparts (<code>'n'</code>, <code>'no'</code>, <code>'false'</code>, <code>'0'</code>), pass real booleans through unchanged, and return <code>None</code> for null or unparseable values.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Normalize everything to a lowercase string after preserving real booleans and nulls.</p>
 
@@ -1940,7 +1937,7 @@ def to_bool(value):
       <span class="p-num">4.3</span><h3>Strip sensitive fields before LLM use</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Load customer records from the cleaning fixture. Before sending them into an LLM prompt, remove sensitive keys (<code>email</code>, <code>phone</code>, <code>tax_id</code>) — without mutating the originals.</p>
+      <p>Practice task: load customer records from the cleaning fixture and create safe copies for LLM prompts. Remove the sensitive keys <code>email</code>, <code>phone</code>, and <code>tax_id</code> from each copy without changing the original records.</p>
       <pre><code>import json
 
 with open('data/cleaning_records.json') as f:
@@ -1977,7 +1974,7 @@ safe_records = [scrub(r) for r in records]</code></pre>
       <span class="p-num">4.4</span><h3>Parse mixed duration strings</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Job logs report durations as <code>'120ms'</code>, <code>'1.5s'</code>, or <code>'2m'</code>. Convert each to seconds as a float; return <code>None</code> for anything unparseable.</p>
+      <p>Practice task: write a parser for job duration strings such as <code>'120ms'</code>, <code>'1.5s'</code>, and <code>'2m'</code>. Convert valid values to seconds as floats and return <code>None</code> for anything that does not match the expected format.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Parse the number and the unit separately, then multiply by a unit conversion table.</p>
 
@@ -2013,7 +2010,7 @@ def parse_duration(text):
       <span class="p-num">4.5</span><h3>Parse messy numeric strings</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Convert values like <code>'$1,249.99'</code>, <code>'15%'</code>, <code>' 42 '</code>, <code>1.5</code>, <code>''</code>, and <code>'N/A'</code> into floats (percent → 0.15). Unparseable → <code>None</code>.</p>
+      <p>Practice task: write <code>to_number(value)</code> that converts messy numeric inputs into floats. Handle currency symbols, commas, surrounding whitespace, numeric inputs, and percentages where <code>'15%'</code> becomes <code>0.15</code>. Return <code>None</code> for blanks, nulls, and unparseable values.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Strip formatting characters before conversion; handle percent as a final adjustment.</p>
 
@@ -2052,7 +2049,7 @@ def parse_duration(text):
       <span class="p-num">4.6</span><h3>Snake-case arbitrary column headers</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Different sources send <code>'customerId'</code>, <code>'Order Total'</code>, <code>'ship-date'</code>, <code>'SKU'</code>. Write <code>to_snake(name)</code> producing <code>customer_id</code>, <code>order_total</code>, <code>ship_date</code>, <code>sku</code>.</p>
+      <p>Practice task: write <code>to_snake(name)</code> to normalize column headers from different sources. Convert spaces and dashes to underscores, split camelCase boundaries, collapse duplicate underscores, and lowercase the result.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Handle separators first, then add underscores at camelCase boundaries.</p>
 
@@ -2084,7 +2081,7 @@ def to_snake(name):
       <span class="p-num">4.7</span><h3>Split records into clean and rejected</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load raw part records from the cleaning fixture: require <code>sku</code> and <code>name</code>, coerce <code>price</code> to float. Return <code>{'clean': [...], 'rejected': [{'record': ..., 'reason': ...}]}</code> — every input lands in exactly one bucket.</p>
+      <p>Practice task: load raw part records from the cleaning fixture and split them into clean and rejected buckets. Clean records must have <code>sku</code> and <code>name</code>, and their <code>price</code> must be converted to a float. Return <code>{'clean': [...], 'rejected': [{'record': ..., 'reason': ...}]}</code>, with every input record in exactly one bucket.</p>
       <pre><code>import json
 
 with open('data/cleaning_records.json') as f:
@@ -2131,7 +2128,7 @@ result = split_records(raw_records)</code></pre>
       <span class="p-num">4.8</span><h3>Map vendor codes to internal values</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load vendor status records from the cleaning fixture. Map status codes (<code>'SHP'</code>, <code>'DLV'</code>, <code>'CNL'</code>...) to internal statuses, default unknowns to <code>'unknown'</code>, and collect the unmapped codes you saw so the mapping can be extended.</p>
+      <p>Practice task: load vendor status records from the cleaning fixture and map each record's vendor status code to an internal status value. Unknown codes should become <code>'unknown'</code>. Return the mapped records together with a sorted list of the unmapped codes seen during the run.</p>
       <pre><code>import json
 
 with open('data/cleaning_records.json') as f:
@@ -2174,7 +2171,7 @@ mapped_records, unmapped = map_statuses(records)</code></pre>
       <span class="p-num">4.9</span><h3>Truncate text at a word boundary</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Product descriptions go into an embedding model with a budget of ~500 characters. Truncate longer text at the last word boundary that fits, appending <code>'…'</code>. Shorter text passes through untouched.</p>
+      <p>Practice task: write a truncation helper for product descriptions before embedding. If text exceeds the character limit, cut it at the last word boundary that fits and append <code>'…'</code>; if the text is already within the limit, return it unchanged.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Find the last space before the limit so you do not cut a word in half.</p>
 
@@ -2203,7 +2200,7 @@ mapped_records, unmapped = map_statuses(records)</code></pre>
       <span class="p-num">4.10</span><h3>Compose a cleaning pipeline</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load pipeline records from the cleaning fixture. You have small transform functions (<code>strip_strings</code>, <code>coerce_price</code>, <code>add_context_text</code>), each taking and returning a record. Write <code>run_pipeline(records, steps)</code> that applies them in order, and build a context string step that skips null fields.</p>
+      <p>Practice task: load pipeline records from the cleaning fixture and compose small record transforms into an ordered cleaning pipeline. Write <code>run_pipeline(records, steps)</code> so each record passes through every step in order, then add a context-string transform that skips fields whose values are <code>None</code>.</p>
       <pre><code>import json
 
 with open('data/cleaning_records.json') as f:
@@ -2263,7 +2260,7 @@ clean_records = run_pipeline(records, steps)</code></pre>
       <span class="p-num">4.11</span><h3>Normalize multi-vendor part records</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Load multi-vendor examples from the cleaning fixture. Write <code>normalize_part(record, vendor)</code> that emits canonical <code>sku</code>, <code>name</code>, <code>price</code>, and <code>active</code>, or returns a rejection reason when required fields are missing or unparseable.</p>
+      <p>Practice task: load multi-vendor examples from the cleaning fixture and write <code>normalize_part(record, vendor)</code>. It should map vendor-specific fields into canonical <code>sku</code>, <code>name</code>, <code>price</code>, and <code>active</code> values, returning either <code>(clean_record, None)</code> or <code>(None, rejection_reason)</code>.</p>
       <pre><code>import json
 
 with open('data/cleaning_records.json') as f:
@@ -2345,7 +2342,7 @@ normalized = [
       <span class="p-num">4.12</span><h3>Deduplicate records with a survivorship rule</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Load duplicate part records from the cleaning fixture. Dedupe by normalized <code>sku</code>. Keep the newest <code>updated_at</code> record; if timestamps tie, keep the one with the most non-null fields. Return kept records and discarded IDs.</p>
+      <p>Practice task: load duplicate part records from the cleaning fixture and deduplicate them by normalized <code>sku</code>. For each SKU, keep the newest <code>updated_at</code> record; if timestamps tie, keep the record with the most non-null fields. Return both the kept records and the IDs of discarded records.</p>
       <pre><code>import json
 
 with open('data/cleaning_records.json') as f:
@@ -2412,7 +2409,7 @@ kept, discarded_ids = dedupe_parts(records)</code></pre>
       <span class="p-num">5.1</span><h3>Defaults, keyword-only args, and validation</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Write <code>generate(prompt, *, model='flash', temperature=0.2)</code> where <code>model</code> and <code>temperature</code> must be passed by keyword, and a temperature outside <code>[0, 2]</code> raises <code>ValueError</code> with a clear message.</p>
+      <p>Practice task: define <code>generate(prompt, *, model='flash', temperature=0.2)</code>. The <code>*</code> should force <code>model</code> and <code>temperature</code> to be keyword-only, and invalid temperatures outside <code>[0, 2]</code> should raise <code>ValueError</code> with a clear message.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Use the function signature to prevent ambiguous positional arguments, then validate the range inside.</p>
 
@@ -2442,7 +2439,7 @@ generate('hi', temperature=0.7)      # ok
       <span class="p-num">5.2</span><h3>Safe parse with try/except</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Write <code>safe_int(value, default=None)</code> that converts strings like <code>'42'</code> and <code>' 7 '</code> to ints and returns the default for <code>'abc'</code>, <code>None</code>, or <code>'3.5'</code> — without ever raising.</p>
+      <p>Practice task: write <code>safe_int(value, default=None)</code>. It should convert integer-like strings such as <code>'42'</code> and <code>' 7 '</code>, but return <code>default</code> for values like <code>'abc'</code>, <code>None</code>, or <code>'3.5'</code> instead of raising.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>The function should absorb expected conversion failures and return the default.</p>
 
@@ -2469,7 +2466,7 @@ generate('hi', temperature=0.7)      # ok
       <span class="p-num">5.3</span><h3>Check required environment variables</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>A connector needs <code>API_BASE_URL</code>, <code>API_TOKEN</code>, and <code>GCP_PROJECT</code>. Write a startup check that raises one error listing <em>all</em> missing variables, and returns them as a dict when present.</p>
+      <p>Practice task: write a startup configuration check for a connector that requires <code>API_BASE_URL</code>, <code>API_TOKEN</code>, and <code>GCP_PROJECT</code>. If any are missing or empty, raise one error listing all missing names; otherwise return the values in a dict.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Collect all missing names first so startup reports the complete configuration problem.</p>
 
@@ -2500,7 +2497,7 @@ def load_env():
       <span class="p-num">5.4</span><h3>Custom exceptions for retryable failures</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Define <code>RetryableError</code> and <code>FatalError</code>. Write <code>check_response(status_code)</code> that raises <code>RetryableError</code> for 429 and 5xx, <code>FatalError</code> for other 4xx, and returns normally for 2xx.</p>
+      <p>Practice task: define <code>RetryableError</code> and <code>FatalError</code>, then write <code>check_response(status_code)</code>. It should return normally for 2xx, raise <code>RetryableError</code> for 429 and 5xx responses, and raise <code>FatalError</code> for other 4xx responses.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>The status code should determine the exception type, not just the message text.</p>
 
@@ -2534,7 +2531,7 @@ def check_response(status_code):
       <span class="p-num">5.5</span><h3>Write a timing decorator</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Write <code>@timed</code> that logs the wrapped function's name and elapsed milliseconds — including when the function raises.</p>
+      <p>Practice task: write a <code>@timed</code> decorator that logs the wrapped function's name and elapsed milliseconds. The timing log should happen whether the wrapped function returns successfully or raises.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Use a <code>finally</code> block so timing is logged whether the wrapped function succeeds or raises.</p>
 
@@ -2572,7 +2569,7 @@ def timed(func):
       <span class="p-num">5.6</span><h3>Write a retry decorator with backoff</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Write <code>@retry(max_attempts=3, base_delay=1.0)</code> that retries on <code>RetryableError</code> with exponential backoff (1s, 2s, 4s…) and re-raises after the final attempt.</p>
+      <p>Practice task: write a parameterized decorator <code>@retry(max_attempts=3, base_delay=1.0)</code>. It should retry only <code>RetryableError</code>, wait with exponential backoff such as 1s, 2s, 4s, and re-raise the final error after the last attempt.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>A decorator with parameters needs one more layer than a simple decorator.</p>
 
@@ -2613,7 +2610,7 @@ def retry(max_attempts=3, base_delay=1.0):
       <span class="p-num">5.7</span><h3>Validate a payload, collecting all errors</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load inference-request payloads from the LLM fixture. Validate that <code>prompt</code> is a non-empty string, <code>max_tokens</code> an int in [1, 4096], and <code>model</code> one of an allowed set. Return a list of <em>all</em> problems, not just the first.</p>
+      <p>Practice task: load the bad inference request from the LLM fixture and validate its fields, returning a list of error messages (empty when everything passes). Check every field rather than stopping at the first failure: <code>prompt</code> must be a non-empty string, <code>max_tokens</code> must be an integer in <code>[1, 4096]</code>, and <code>model</code> must be in the allowed set.</p>
       <pre><code>import json
 
 with open('data/llm_payloads.json') as f:
@@ -2664,7 +2661,7 @@ errors = validate_request(payload)</code></pre>
       <span class="p-num">5.8</span><h3>Write a context manager</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Write a <code>timer(label)</code> context manager so you can wrap any block in <code>with timer('embed batch'):</code> and get the elapsed time logged, even if the block raises.</p>
+      <p>Practice task: write a <code>timer(label)</code> context manager. Code inside <code>with timer('embed batch'):</code> should run normally, and elapsed time should be logged or printed even if the block raises.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Think of the code before <code>yield</code> as setup and the code after it as cleanup.</p>
 
@@ -2700,7 +2697,7 @@ with timer('embed batch'):
       <span class="p-num">5.9</span><h3>Cache an expensive lookup</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Looking up a part's category hits a slow service, and your job calls it thousands of times with repeating SKUs. Add caching — and explain when this approach is the wrong tool.</p>
+      <p>Practice task: add in-process caching to a slow part-category lookup so repeated calls for the same SKU avoid the slow service. Also be ready to explain when this cache is the wrong tool, such as changing data or cross-process needs.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Cache only when repeated calls with the same hashable input should return the same answer.</p>
 
@@ -2739,7 +2736,7 @@ get_category.cache_info()   # hits, misses, currsize</code></pre>
       <span class="p-num">5.10</span><h3>Generator that survives bad records</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load raw part records from the cleaning fixture. Write <code>iter_clean(records)</code>, a generator that yields parsed records one at a time, logs and skips any record that fails parsing, and never loads the whole result into memory.</p>
+      <p>Practice task: load raw part records from the cleaning fixture and write <code>iter_clean(records)</code>. It should be a generator that yields one parsed record at a time, logs and skips records that fail parsing, and avoids building the full output list internally.</p>
       <pre><code>import json
 
 with open('data/cleaning_records.json') as f:
@@ -2785,7 +2782,7 @@ published = list(iter_clean(raw_feed))   # lazy until consumed</code></pre>
       <span class="p-num">5.11</span><h3>Retry with a total deadline</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Write <code>call_with_retries(fn, *, deadline_s, max_attempts)</code> that retries <code>RetryableError</code> with exponential backoff, but never sleeps past the total deadline. Re-raise the last error when attempts or time run out.</p>
+      <p>Practice task: write <code>call_with_retries(fn, *, deadline_s, max_attempts)</code>. It should retry <code>RetryableError</code> with exponential backoff, respect an overall deadline across all attempts and sleeps, and re-raise the last error when attempts or time run out.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Track both attempt count and elapsed monotonic time; cap each sleep by the remaining deadline.</p>
 
@@ -2826,7 +2823,7 @@ def call_with_retries(fn, *, deadline_s=30, max_attempts=5, base_delay=1.0):
       <span class="p-num">5.12</span><h3>Build a validator registry</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Load the parts quality fixture. Create a tiny validation framework where functions can register checks by dataset name. <code>run_validators('parts', df)</code> should run every registered check and return all issues with the check name attached.</p>
+      <p>Practice task: load the parts quality fixture and build a tiny validation registry. Validator functions should register themselves under a dataset name, and <code>run_validators('parts', df)</code> should run every registered check and return all issues with the check name attached.</p>
       <pre><code>import pandas as pd
 
 df = pd.read_csv('data/parts_quality.csv')</code></pre>
@@ -2884,7 +2881,7 @@ issues = run_validators('parts', df)</code></pre>
       <span class="p-num">6.1</span><h3>A correct GET request</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Fetch the latest <code>BTC-USD</code> ticker from Coinbase's public Exchange API at <code>https://api.exchange.coinbase.com/products/BTC-USD/ticker</code>, with a timeout, an error on bad status, and parsed JSON back.</p>
+      <p>Practice task: write a function that fetches the latest <code>BTC-USD</code> ticker from Coinbase's public Exchange API. The request must set a timeout, raise on non-success HTTP status codes, and return the parsed JSON body.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Make the request safely first, then parse only after the status has been checked.</p>
 
@@ -2915,7 +2912,7 @@ def fetch_ticker(product_id='BTC-USD'):
       <span class="p-num">6.2</span><h3>POST JSON with auth</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Load API records from the fixture and POST them to HTTPBin's public echo endpoint at <code>https://httpbin.org/post</code> with a bearer token read from the environment. Fail fast if the token isn't set.</p>
+      <p>Practice task: load API records from the fixture and POST them as JSON to HTTPBin's public echo endpoint at <code>https://httpbin.org/post</code>. Read the bearer token from the environment and raise before making the request if the token is missing.</p>
       <pre><code>import json
 
 with open('data/api_records.json') as f:
@@ -2960,7 +2957,7 @@ def push_records(records):
       <span class="p-num">6.3</span><h3>Respect a 429 Retry-After</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>When the API returns 429, read the <code>Retry-After</code> header (seconds), wait that long, and try once more. Default to 5 seconds if the header is missing.</p>
+      <p>Practice task: write a GET helper that handles one rate-limit retry. If the first response is HTTP 429, read the <code>Retry-After</code> header as seconds, wait that long, and try once more; use 5 seconds when the header is missing.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>A 429 response is the server asking you to slow down; retry once after its requested delay.</p>
 
@@ -2993,7 +2990,7 @@ def fetch_with_courtesy(url):
       <span class="p-num">6.4</span><h3>Offset/limit pagination</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>An endpoint accepts <code>offset</code> and <code>limit</code> (max 100) and returns <code>{'items': [...]}</code>. Collect every item; stop when a page comes back short or empty. Add a safety cap on total pages.</p>
+      <p>Practice task: write an offset/limit pagination helper for an endpoint that accepts <code>offset</code> and <code>limit</code> and returns <code>{'items': [...]}</code>. Collect all items, stop when a page contains fewer than <code>limit</code> items, and raise if a maximum page cap is exceeded.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Accumulate each page and stop when the API returns fewer records than the requested limit.</p>
 
@@ -3031,7 +3028,7 @@ def fetch_all(url, limit=100, max_pages=1000):
       <span class="p-num">6.5</span><h3>Cursor pagination as a generator</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Coinbase's public trades endpoint is cursor-paginated with <code>CB-AFTER</code> response headers. Write a generator that yields <code>BTC-USD</code> trades one at a time, requesting older pages only when needed.</p>
+      <p>Practice task: write a generator for Coinbase's cursor-paginated trades endpoint. It should yield <code>BTC-USD</code> trades one at a time and request the next page only after the current page has been consumed, using the <code>CB-AFTER</code> response header as the next cursor.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Keep the cursor as loop state and yield trades before deciding whether another page exists.</p>
 
@@ -3073,7 +3070,7 @@ def iter_trades(product_id='BTC-USD', limit=100):
       <span class="p-num">6.6</span><h3>Retries with backoff and jitter</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Wrap an API call so it retries up to 4 times on timeouts and 5xx responses, with exponential backoff plus random jitter. 4xx responses (except 429) should fail immediately.</p>
+      <p>Practice task: write a GET helper that retries transient API failures up to 4 total attempts. Retry timeouts, connection errors, HTTP 429, and 5xx responses with exponential backoff plus random jitter; fail immediately for other 4xx responses.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Retry only transient failures, and make each delay longer than the last.</p>
 
@@ -3116,7 +3113,7 @@ def fetch_with_retries(url, max_attempts=4, base_delay=1.0):
       <span class="p-num">6.7</span><h3>Batch upload with failure isolation</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load batch records from the API fixture and push them to HTTPBin's public echo endpoint in batches. One failed batch must not abort the job. Return a summary: <code>{'pushed': n, 'failed_batches': [(batch_index, error), ...]}</code>.</p>
+      <p>Practice task: load batch records from the API fixture and POST them to HTTPBin's public echo endpoint in batches. A failed batch should be recorded but should not stop later batches. Return <code>{'pushed': n, 'failed_batches': [(batch_index, error), ...]}</code>.</p>
       <pre><code>import json
 
 with open('data/api_records.json') as f:
@@ -3162,7 +3159,7 @@ def push_in_batches(records, batch_size=200):
       <span class="p-num">6.8</span><h3>Reuse a session with default headers</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Your connector makes hundreds of calls to Coinbase's public Exchange API. Set up a <code>requests.Session</code> with default headers and a base-URL helper so call sites just say <code>api_get('/products/BTC-USD/ticker')</code>.</p>
+      <p>Practice task: set up a reusable <code>requests.Session</code> for a connector that makes many Coinbase Exchange API calls. Add default headers and a base-URL helper so callers can fetch JSON with paths like <code>api_get('/products/BTC-USD/ticker')</code>.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Centralize base URL, default headers, and connection reuse so call sites stay small.</p>
 
@@ -3200,7 +3197,7 @@ api_get('/products/BTC-USD/ticker')</code></pre>
       <span class="p-num">6.9</span><h3>Call an LLM endpoint defensively</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Write <code>ask_model(prompt)</code> that POSTs to a chat-completions-style endpoint and returns the reply text — handling timeouts, empty <code>choices</code>, and missing content without crashing the caller. Return <code>None</code> on any failure, logging why.</p>
+      <p>Practice task: write <code>ask_model(prompt)</code> for a chat-completions-style endpoint. It should POST the prompt, return the assistant reply text on success, and return <code>None</code> while logging the reason for network errors, non-JSON responses, empty <code>choices</code>, or missing content.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Separate network failure, non-JSON response, and unexpected JSON shape in your control flow.</p>
 
@@ -3252,7 +3249,7 @@ def ask_model(prompt, model='flash'):
       <span class="p-num">6.10</span><h3>A minimal rate limiter</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load Coinbase product ids from the pipeline fixture. An API allows 2 requests per second. Write a tiny limiter that enforces a minimum interval between calls, then use it in a loop fetching product tickers.</p>
+      <p>Practice task: load Coinbase product IDs from the pipeline fixture and fetch each product ticker while respecting a 2-requests-per-second limit. Write a small rate limiter that enforces the minimum interval between API calls.</p>
       <pre><code>import json
 
 with open('data/pipeline_runs.json') as f:
@@ -3309,7 +3306,7 @@ for product_id in product_ids:
       <span class="p-num">6.11</span><h3>Fan-out: fetch details for many ids</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load Coinbase product ids from the pipeline fixture. Call <code>/products/{id}</code> for each. Collect successes and failures separately, and report progress every 50 ids. (Sequential is fine — discuss how you'd speed it up.)</p>
+      <p>Practice task: load Coinbase product IDs from the pipeline fixture and call <code>/products/{id}</code> for each ID. Collect successful product details separately from per-ID failures, log progress every 50 IDs, and keep the implementation sequential unless you choose to discuss a concurrency follow-up.</p>
       <pre><code>import json
 
 with open('data/pipeline_runs.json') as f:
@@ -3364,7 +3361,7 @@ results, failures = fetch_product_details(product_ids)</code></pre>
       <span class="p-num">6.12</span><h3>Make a connector unit-testable</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Refactor a fetch function so it can be tested without the network, then write the fake and a test for the error path.</p>
+      <p>Practice task: refactor a fetch function so its network dependency is injected instead of hard-coded. Then write a small fake session/response and a test that proves the function raises on an HTTP error response.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Inject the network collaborator so the function can run against a fake object.</p>
 
@@ -3418,7 +3415,7 @@ def test_fetch_products_raises_on_500():
       <span class="p-num">6.13</span><h3>Refresh auth and retry once</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Write <code>api_get(path)</code> for a connector with expiring bearer tokens. On HTTP 401, refresh the token and retry once. Other 4xx errors should fail immediately; 5xx can be left for the caller's retry layer.</p>
+      <p>Practice task: write <code>api_get(path)</code> for a connector that uses expiring bearer tokens. If a request returns HTTP 401, refresh the token and retry exactly once. Let other HTTP errors flow through <code>raise_for_status()</code> so the caller or retry layer can decide what to do.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Keep token refresh separate from request execution, and prevent infinite retry loops.</p>
 
@@ -3469,7 +3466,7 @@ def test_fetch_products_raises_on_500():
       <span class="p-num">6.14</span><h3>Concurrent fan-out with ordered results</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Load Coinbase product ids from the pipeline fixture and fetch details concurrently, but return results in the same order as the input list. Capture per-product failures without raising until the caller decides what to do.</p>
+      <p>Practice task: load Coinbase product IDs from the pipeline fixture and fetch product details concurrently. Even though requests finish out of order, return the results list in the same order as the input IDs and collect per-product failures separately.</p>
       <pre><code>import json
 
 with open('data/pipeline_runs.json') as f:
@@ -3533,7 +3530,7 @@ results, failures = fetch_many_products(product_ids)</code></pre>
       <span class="p-num">7.1</span><h3>The mutable default argument</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>This function misbehaves on repeated calls. Why, and what's the fix?</p>
+      <p>Practice task: identify why this function returns surprising results across repeated calls, explain the shared-state bug, and rewrite it so each call gets an independent default list unless one is explicitly provided.</p>
       <pre><code>def add_tag(record, tags=[]):
     tags.append(record['category'])
     return tags</code></pre>
@@ -3566,7 +3563,7 @@ def add_tag(record, tags=None):
       <span class="p-num">7.2</span><h3>One bad record kills the batch</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>One malformed record stops the remaining 9,999 from processing. Restructure so failures are isolated and counted.</p>
+      <p>Practice task: restructure the batch loop so one malformed record does not stop the remaining records from processing. Collect successful results, log failed records, and count how many records failed.</p>
       <pre><code>def process_all(records):
     results = []
     for record in records:
@@ -3604,7 +3601,7 @@ def add_tag(record, tags=None):
       <span class="p-num">7.3</span><h3>Empty input crashes the average</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>This works in the demo and crashes in production on quiet days. What happens, and what should it do instead?</p>
+      <p>Practice task: explain why this average function crashes when there are no latency values, then rewrite it so empty input returns a deliberate "no data" value instead of raising.</p>
       <pre><code>def avg_latency(latencies):
     return sum(latencies) / len(latencies)</code></pre>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
@@ -3635,7 +3632,7 @@ def avg_latency(latencies):
       <span class="p-num">7.4</span><h3>Crash on missing nested keys</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>This line works for most API records and occasionally explodes. List the ways it can fail and write a robust version.</p>
+      <p>Practice task: list the failure modes for this nested API lookup, including missing keys and <code>None</code> intermediate values. Then write a robust version that returns a default display name instead of crashing.</p>
       <pre><code>name = record['customer']['profile']['display_name']</code></pre>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Any nested lookup can fail because a key is missing or an intermediate value is <code>None</code>.</p>
@@ -3667,7 +3664,7 @@ name = (
       <span class="p-num">7.5</span><h3>Mutating a list while iterating</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>This is supposed to drop discontinued parts, but some survive. Why?</p>
+      <p>Practice task: explain why this loop can leave some discontinued parts behind, then rewrite it so all discontinued records are removed without mutating the list while iterating over it.</p>
       <pre><code>for part in parts:
     if part['discontinued']:
         parts.remove(part)</code></pre>
@@ -3697,7 +3694,7 @@ parts = [p for p in parts if not p['discontinued']]</code></pre>
       <span class="p-num">7.6</span><h3>The except that hides everything</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>This connector "never fails" — and the data is quietly wrong for a week. Critique and fix.</p>
+      <p>Practice task: critique why this connector hides failures from logs and the scheduler, then rewrite the exception handling so expected request failures are logged with a traceback and re-raised.</p>
       <pre><code>import logging
 import requests
 
@@ -3742,7 +3739,7 @@ def sync_orders():
       <span class="p-num">7.7</span><h3>The merge that multiplies rows</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load orders and a deliberately duplicated parts lookup. After joining them, the orders table has <em>more</em> rows than before, and revenue totals doubled. What happened and how do you find and fix it?</p>
+      <p>Practice task: load orders and a deliberately duplicated parts lookup, then diagnose why a left join produces more rows than the original orders table. Find the duplicate lookup keys, deduplicate the lookup safely, and guard the merge so the row multiplication cannot happen silently again.</p>
       <pre><code>import pandas as pd
 
 orders = pd.read_csv('data/orders.csv')
@@ -3789,7 +3786,7 @@ enriched = orders.merge(parts_clean, on='sku',
       <span class="p-num">7.8</span><h3>SettingWithCopyWarning</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load the parts catalog. This emits a <code>SettingWithCopyWarning</code> and the new column sometimes doesn't stick. Explain and fix.</p>
+      <p>Practice task: load the parts catalog, explain why assigning to the filtered <code>active</code> DataFrame triggers <code>SettingWithCopyWarning</code>, and show the two correct fixes: make an explicit copy for a subset or use <code>.loc</code> to update the original.</p>
       <pre><code>import pandas as pd
 
 df = pd.read_csv('data/parts.csv')
@@ -3829,7 +3826,7 @@ df.loc[df['status'] == 'active', 'priority'] = 'high'</code></pre>
       <span class="p-num">7.9</span><h3>The shared class attribute</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Every connector instance somehow sees every other connector's errors. Why?</p>
+      <p>Practice task: explain why every <code>Connector</code> instance shares the same <code>errors</code> list, then rewrite the class so each instance tracks only its own errors.</p>
       <pre><code>class Connector:
     errors = []
 
@@ -3866,7 +3863,7 @@ class Connector:
       <span class="p-num">7.10</span><h3>Timezone-naive comparisons</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>This "last 24 hours" filter silently returns the wrong window for a team in Chicago reading UTC data — and sometimes raises a <code>TypeError</code>. Diagnose and fix.</p>
+      <p>Practice task: diagnose the timezone bug in this "last 24 hours" filter. Explain the difference between naive local datetimes and UTC-aware datetimes, then rewrite the filter so all comparisons happen with timezone-aware UTC values.</p>
       <pre><code>from datetime import datetime, timedelta
 
 records = [
@@ -3914,7 +3911,7 @@ recent = [r for r in records if parse_ts(r['created_at']) &gt; cutoff]</code></p
       <span class="p-num">7.11</span><h3>json.dumps blows up on real data</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Serializing warehouse rows fails with <code>TypeError: Object of type datetime is not JSON serializable</code>. Show the quick fix and the production fix.</p>
+      <p>Practice task: show two ways to serialize this warehouse row to JSON. First provide the quick <code>default=str</code> fix, then write an explicit encoder for known types like <code>datetime</code> and <code>Decimal</code>.</p>
       <pre><code>import json
 from datetime import datetime
 from decimal import Decimal
@@ -3962,7 +3959,7 @@ json.dumps(row, default=encode)</code></pre>
       <span class="p-num">7.12</span><h3>Make a rerunnable (idempotent) load</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>This daily script duplicates data every time someone re-runs it after a partial failure. What property is missing, and what are two ways to add it?</p>
+      <p>Practice task: identify the missing reliability property that makes this daily load duplicate data on reruns. Then describe or sketch two idempotent approaches, such as replacing the day's partition or upserting by natural key.</p>
       <pre><code>def daily_load():
     orders = fetch_orders(date=today())
     insert_into_warehouse(orders)   # plain INSERT/append</code></pre>
@@ -4001,7 +3998,7 @@ def daily_load():
       <span class="p-num">7.13</span><h3>The late-binding lambda trap</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>This code builds validators for several required fields, but every validator checks the same final field. Explain why and fix it.</p>
+      <p>Practice task: explain why every generated validator checks only the final loop field, then fix the closure so each validator remembers the field it was created for.</p>
       <pre><code>validators = []
 for field in ['sku', 'name', 'price']:
     validators.append(lambda record: field in record)</code></pre>
@@ -4038,7 +4035,7 @@ validators = [required_field(f) for f in ['sku', 'name', 'price']]</code></pre>
       <span class="p-num">7.14</span><h3>The retry loop that lies about success</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>This helper is supposed to retry an unreliable API call, but the scheduler sometimes marks the job successful even though every attempt failed. Find the bug and fix it.</p>
+      <p>Practice task: find why this retry helper can make a failed job look successful. Rewrite it so HTTP errors are checked, failed attempts are logged, and the final failure is raised instead of returning <code>None</code>.</p>
       <pre><code>import logging
 import requests
 
@@ -4089,7 +4086,7 @@ def get_with_retry(url, attempts=3):
       <span class="p-num">8.1</span><h3>A basic class with a useful repr</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Model a <code>PipelineRun</code> with <code>pipeline</code>, <code>run_id</code>, and <code>status</code> (default <code>'pending'</code>). Add a <code>mark(status)</code> method and make instances print readably for logs.</p>
+      <p>Practice task: define a <code>PipelineRun</code> class with <code>pipeline</code>, <code>run_id</code>, and <code>status</code>, defaulting status to <code>'pending'</code>. Add <code>mark(status)</code> to update the status and implement <code>__repr__</code> so instances are readable in logs.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Store the fields on <code>self</code>, add a small mutator, and make logs readable with <code>__repr__</code>.</p>
 
@@ -4123,7 +4120,7 @@ def get_with_retry(url, attempts=3):
       <span class="p-num">8.2</span><h3>Use a dataclass for record types</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Rewrite a <code>Part</code> record as a dataclass: <code>sku</code>, <code>name</code>, <code>price</code>, optional <code>category</code> defaulting to <code>'uncategorized'</code>. Show how to get a dict out of it for JSON serialization.</p>
+      <p>Practice task: model a <code>Part</code> record as a dataclass with <code>sku</code>, <code>name</code>, <code>price</code>, and optional <code>category</code> defaulting to <code>'uncategorized'</code>. Then show how to convert an instance to a dictionary for JSON serialization.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>A dataclass is a good fit when the class is mostly named fields with light behavior.</p>
 
@@ -4158,7 +4155,7 @@ asdict(part)
       <span class="p-num">8.3</span><h3>Alternative constructor with a classmethod</h3><span class="badge easy">Easy</span>
     </div>
     <div class="p-body">
-      <p>Load the API payload fixture. Add <code>Part.from_api(payload)</code> that builds a <code>Part</code> from an API dict with different field names (<code>'partNumber'</code>, <code>'displayName'</code>, <code>'unitPrice'</code>).</p>
+      <p>Practice task: load the API payload fixture and add an alternate constructor <code>Part.from_api(payload)</code>. It should translate external field names like <code>'partNumber'</code>, <code>'displayName'</code>, and <code>'unitPrice'</code> into the dataclass fields.</p>
       <pre><code>import json
 
 with open('data/llm_payloads.json') as f:
@@ -4205,7 +4202,7 @@ part = Part.from_api(payload)</code></pre>
       <span class="p-num">8.4</span><h3>Validate with a property</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>A <code>ModelConfig</code> has a <code>temperature</code> that must stay in [0, 2] — including when someone assigns to it after construction. Enforce it with a property.</p>
+      <p>Practice task: define a <code>ModelConfig</code> where <code>temperature</code> must always stay in <code>[0, 2]</code>. Use a property so the same validation runs during construction and when someone assigns a new temperature later.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>A property lets construction and later assignment share the same validation path.</p>
 
@@ -4241,7 +4238,7 @@ part = Part.from_api(payload)</code></pre>
       <span class="p-num">8.5</span><h3>Statuses as an Enum with legal transitions</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Replace stringly-typed run statuses with an <code>Enum</code> (<code>PENDING</code>, <code>RUNNING</code>, <code>SUCCESS</code>, <code>FAILED</code>) and write <code>advance(run, new_status)</code> that rejects illegal transitions like <code>SUCCESS → RUNNING</code>.</p>
+      <p>Practice task: replace string-based run statuses with a <code>Status</code> enum containing <code>PENDING</code>, <code>RUNNING</code>, <code>SUCCESS</code>, and <code>FAILED</code>. Then write <code>advance(run, new_status)</code> so only legal state transitions are accepted.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Model statuses as values from a finite set, then define legal moves separately.</p>
 
@@ -4282,7 +4279,7 @@ def advance(run, new_status):
       <span class="p-num">8.6</span><h3>Abstract base class for connectors</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load a Coinbase-style product payload. Define a <code>BaseConnector</code> ABC with abstract <code>fetch()</code> and <code>transform(records)</code>, plus a concrete <code>run()</code> that wires them together. Implement one subclass.</p>
+      <p>Practice task: load a Coinbase-style product payload and define a <code>BaseConnector</code> abstract base class. Subclasses must implement <code>fetch()</code> and <code>transform(records)</code>, while the base class provides a concrete <code>run()</code> method that calls them in order. Implement one working subclass.</p>
       <pre><code>import json
 
 with open('data/coinbase_products.json') as f:
@@ -4346,7 +4343,7 @@ products = ProductsConnector().run()</code></pre>
       <span class="p-num">8.7</span><h3>Dependency injection for testability</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Build an <code>AlertNotifier</code> that sends pipeline-failure alerts through a pluggable sender (Slack in prod, a fake in tests). Show the test double.</p>
+      <p>Practice task: build an <code>AlertNotifier</code> that sends pipeline-failure alerts through an injected sender object. Show a production-style sender and a fake sender that records messages for tests.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>The notifier should depend on a sender interface, not on Slack directly.</p>
 
@@ -4393,7 +4390,7 @@ def test_alert_includes_pipeline_name():
       <span class="p-num">8.8</span><h3>Make a container feel native with dunders</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Build a <code>RecordBatch</code> wrapper around event-like records so that <code>len(batch)</code>, <code>for record in batch:</code>, and <code>batch[0]</code> all work, plus an <code>ids</code> property.</p>
+      <p>Practice task: build a <code>RecordBatch</code> wrapper around event-like records. It should support <code>len(batch)</code>, iteration with <code>for record in batch</code>, indexing with <code>batch[0]</code>, and an <code>ids</code> property that returns all record IDs.</p>
       <pre><code>records = [
     {'id': 'evt-1001', 'pipeline': 'orders_sync'},
     {'id': 'evt-1002', 'pipeline': 'parts_embed'},
@@ -4443,7 +4440,7 @@ batch_ids = batch.ids</code></pre>
       <span class="p-num">8.9</span><h3>A connection as a context manager</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Write a <code>WarehouseConnection</code> class usable as <code>with WarehouseConnection(project) as conn:</code> — opening on enter, always closing on exit, and not suppressing exceptions.</p>
+      <p>Practice task: write a <code>WarehouseConnection</code> context-manager class usable as <code>with WarehouseConnection(project) as conn:</code>. It should open the client on enter, always close it on exit, and allow exceptions from the <code>with</code> block to propagate.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Resource cleanup belongs in <code>__exit__</code>, which runs even when the <code>with</code> block raises.</p>
 
@@ -4490,7 +4487,7 @@ class WarehouseConnection:
       <span class="p-num">8.10</span><h3>Compose a pipeline from injected parts</h3><span class="badge medium">Medium</span>
     </div>
     <div class="p-body">
-      <p>Load API records and build a <code>SyncJob</code> that takes a <code>source</code> (has <code>.fetch()</code>), a list of transform functions, and a <code>sink</code> (has <code>.write(records)</code>). Its <code>run()</code> returns a summary dict: fetched, written, failed counts.</p>
+      <p>Practice task: load API records and build a composable <code>SyncJob</code>. It should receive a <code>source</code> with <code>.fetch()</code>, a list of transform functions, and a <code>sink</code> with <code>.write(records)</code>. Its <code>run()</code> should return fetched, written, and failed counts.</p>
       <pre><code>import json
 
 with open('data/api_records.json') as f:
@@ -4565,7 +4562,7 @@ summary = SyncJob(ListSource(records), [normalize_sku], sink).run()</code></pre>
       <span class="p-num">8.11</span><h3>Design a connector with explicit dependencies</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Load a Coinbase-style product payload. Build a small <code>ProductsConnector</code> class that receives an HTTP client, the Coinbase Exchange base URL, and a transformer. <code>run()</code> should fetch raw product records, transform them, write them to a sink, and return counts. Avoid globals.</p>
+      <p>Practice task: load a Coinbase-style product payload and build a small <code>ProductsConnector</code>. Inject the HTTP client, Coinbase Exchange base URL, transformer, and sink. <code>run()</code> should fetch raw records, transform valid records, write them to the sink, count failures, and avoid globals.</p>
       <pre><code>import json
 
 with open('data/coinbase_products.json') as f:
@@ -4645,7 +4642,7 @@ summary = ProductsConnector(
       <span class="p-num">8.12</span><h3>Model a semantic metric request</h3><span class="badge hard">Hard</span>
     </div>
     <div class="p-body">
-      <p>Create dataclasses for a semantic-layer metric request: metric name, dimensions, filters, and limit. Validate that limit is positive and filters have <code>field</code>, <code>op</code>, and <code>value</code>. Produce a JSON-ready dict.</p>
+      <p>Practice task: create dataclasses for a semantic-layer metric request. Model the metric name, dimensions, filters, and limit; validate that the limit is positive and each filter has the required fields; then produce a JSON-ready dictionary payload.</p>
       <details class="solution"><summary>Hint #1</summary><div class="sol-body">
       <p>Use dataclasses for structure, but put validation in <code>__post_init__</code> so invalid objects cannot be created.</p>
 
