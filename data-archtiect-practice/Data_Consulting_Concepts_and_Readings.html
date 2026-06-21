@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Consulting — Concepts &amp; Readings</title>
+<style>
+  :root{
+    --ink:#10241f;          /* deep teal-black */
+    --ink-soft:#3a544d;
+    --paper:#f5f2ea;        /* warm bone */
+    --paper-2:#ece7da;
+    --rule:#cdc6b4;
+    --accent:#0f7a5a;       /* eigen green */
+    --accent-2:#c2622d;     /* clay */
+    --code-bg:#10241f;
+    --code-ink:#dfe9e3;
+    --chip:#e3ddcd;
+    --shadow:0 1px 0 rgba(16,36,31,.06),0 8px 28px -18px rgba(16,36,31,.35);
+    --mono:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);line-height:1.62;font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px;}
+  /* ---------- header ---------- */
+  header.hero{
+    border-bottom:2px solid var(--ink);
+    background:
+      radial-gradient(120% 100% at 85% -10%, rgba(15,122,90,.10), transparent 60%),
+      var(--paper);
+  }
+  .hero-inner{padding:54px 0 40px;}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin:0 0 14px;}
+  h1.title{
+    font-family:var(--serif);font-weight:600;font-size:clamp(34px,5vw,56px);
+    line-height:1.02;margin:0 0 16px;letter-spacing:-.01em;
+  }
+  h1.title em{font-style:italic;color:var(--accent);}
+  .lede{font-size:18px;color:var(--ink-soft);max-width:70ch;margin:0;}
+  .crosslinks{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;}
+  .crosslinks a{
+    font-family:var(--mono);font-size:12.5px;text-decoration:none;color:var(--ink);
+    border:1px solid var(--ink);border-radius:999px;padding:7px 15px;background:transparent;
+    transition:all .15s ease;
+  }
+  .crosslinks a:hover{background:var(--ink);color:var(--paper);}
+  .crosslinks a.alt{border-color:var(--accent);color:var(--accent);}
+  .crosslinks a.alt:hover{background:var(--accent);color:#fff;}
+
+  /* ---------- layout ---------- */
+  .grid{display:grid;grid-template-columns:248px 1fr;gap:46px;align-items:start;padding:42px 0 90px;}
+  nav.toc{position:sticky;top:18px;font-size:13.5px;}
+  nav.toc .toc-head{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 12px;}
+  nav.toc ol{list-style:none;margin:0;padding:0;counter-reset:s;}
+  nav.toc li{counter-increment:s;margin:1px 0;}
+  nav.toc a{
+    display:block;text-decoration:none;color:var(--ink-soft);padding:5px 9px;border-radius:7px;
+    border-left:2px solid transparent;line-height:1.35;
+  }
+  nav.toc a::before{content:counter(s,decimal-leading-zero);font-family:var(--mono);font-size:10.5px;color:var(--accent);margin-right:9px;}
+  nav.toc a:hover{background:var(--paper-2);color:var(--ink);}
+  nav.toc a.active{border-left-color:var(--accent);color:var(--ink);background:var(--paper-2);font-weight:600;}
+
+  main{min-width:0;}
+  section.mod{margin:0 0 8px;padding:34px 0 30px;border-top:1px solid var(--rule);}
+  section.mod:first-of-type{border-top:none;padding-top:6px;}
+  .mod h2{
+    font-family:var(--serif);font-size:clamp(24px,3.2vw,33px);font-weight:600;
+    margin:0 0 6px;letter-spacing:-.01em;line-height:1.1;display:flex;gap:14px;align-items:baseline;
+  }
+  .mod h2 .num{font-family:var(--mono);font-size:14px;color:var(--accent);font-weight:400;}
+  .mod .sub{color:var(--ink-soft);margin:0 0 22px;font-size:15.5px;}
+  h3{font-family:var(--sans);font-size:18.5px;font-weight:700;margin:26px 0 8px;color:var(--ink);}
+  h4{font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-2);margin:20px 0 6px;}
+  p{margin:0 0 13px;}
+  ul,ol.list{margin:0 0 14px;padding-left:22px;}
+  li{margin:5px 0;}
+  strong{font-weight:700;}
+  em.term{font-style:normal;font-weight:700;color:var(--accent);}
+  a.inline{color:var(--accent);text-underline-offset:2px;}
+
+  /* ---------- callouts ---------- */
+  .note{
+    border-left:3px solid var(--accent);background:var(--paper-2);
+    padding:13px 16px;border-radius:0 9px 9px 0;margin:16px 0;font-size:15px;
+  }
+  .note.warn{border-left-color:var(--accent-2);}
+  .note .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:3px;}
+  .note.warn .tag{color:var(--accent-2);}
+  .interview{
+    border:1px dashed var(--ink-soft);border-radius:10px;padding:13px 16px;margin:16px 0;
+    background:rgba(15,122,90,.04);font-size:15px;
+  }
+  .interview .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);display:block;margin-bottom:6px;}
+
+  /* ---------- tables ---------- */
+  .tw{overflow-x:auto;margin:16px 0;border:1px solid var(--rule);border-radius:10px;}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--paper);}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--rule);vertical-align:top;}
+  th{background:var(--ink);color:var(--paper);font-weight:600;font-size:13px;letter-spacing:.02em;}
+  tr:last-child td{border-bottom:none;}
+  tbody tr:nth-child(even){background:var(--paper-2);}
+  td strong{color:var(--ink);}
+
+  /* ---------- code ---------- */
+  pre{
+    background:var(--code-bg);color:var(--code-ink);border-radius:11px;padding:16px 18px;
+    overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.55;margin:14px 0;
+    box-shadow:var(--shadow);
+  }
+  code{font-family:var(--mono);font-size:.92em;background:var(--chip);padding:1px 6px;border-radius:5px;color:var(--ink);}
+  pre code{background:none;padding:0;color:inherit;font-size:13px;}
+  .ascii{white-space:pre;font-family:var(--mono);font-size:12.5px;line-height:1.4;background:var(--paper-2);border:1px solid var(--rule);border-radius:10px;padding:16px;overflow-x:auto;margin:14px 0;color:var(--ink);}
+
+  /* ---------- chips / glossary ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+  .chips span{font-family:var(--mono);font-size:12px;background:var(--chip);border:1px solid var(--rule);border-radius:6px;padding:4px 9px;color:var(--ink);}
+
+  /* ---------- readings block ---------- */
+  .readings{margin:14px 0;border:1px solid var(--rule);border-radius:11px;overflow:hidden;}
+  .readings summary{
+    cursor:pointer;list-style:none;padding:12px 16px;background:var(--paper-2);
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);
+    display:flex;align-items:center;gap:10px;user-select:none;
+  }
+  .readings summary::-webkit-details-marker{display:none;}
+  .readings summary::before{content:"▸";color:var(--accent-2);transition:transform .15s;}
+  .readings[open] summary::before{transform:rotate(90deg);}
+  .readings .body{padding:6px 18px 14px;}
+  .readings ul{margin:8px 0 0;padding-left:20px;}
+  .readings li{margin:7px 0;font-size:14.5px;}
+  .readings .why{color:var(--ink-soft);font-size:13.5px;}
+  .src{font-family:var(--mono);font-size:11.5px;color:var(--accent);}
+
+  footer{border-top:2px solid var(--ink);padding:30px 0 60px;color:var(--ink-soft);font-size:13.5px;}
+  footer a{color:var(--accent);}
+  .backtotop{font-family:var(--mono);font-size:12px;}
+
+  @media (max-width:880px){
+    .grid{grid-template-columns:1fr;gap:0;}
+    nav.toc{position:static;margin-bottom:24px;border-bottom:1px solid var(--rule);padding-bottom:16px;}
+    nav.toc ol{column-count:2;column-gap:18px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <p class="eyebrow">Eigenbasis Lab · Reference 01</p>
+    <h1 class="title">Data Consulting<br><em>Concepts &amp; Readings</em></h1>
+    <p class="lede">The full concept surface for design-level interviews and billable delivery across data migration, platform modernization, analytics engineering, and data quality — each topic paired with the trade-off questions interviewers actually probe and a short, curated reading to learn it from.</p>
+    <div class="crosslinks">
+      <a class="alt" href="Data_Consulting_Study_Itinerary.html">→ 10-Week Study Itinerary</a>
+      <a class="alt" href="Data_Consulting_Tools_Guide.html">→ Tools Guide</a>
+      <a href="#part1">Platform &amp; Warehouse</a>
+      <a href="#part2">Migration &amp; Validation</a>
+      <a href="#part3">Analytics Engineering</a>
+      <a href="#part4">Data Quality</a>
+      <a href="#part7">Architecture</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="grid">
+
+  <!-- ============ TOC ============ -->
+  <nav class="toc" aria-label="Table of contents">
+    <p class="toc-head">Contents</p>
+    <ol>
+      <li><a href="#how-to-use">How to use this</a></li>
+      <li><a href="#part1">Platform &amp; Warehouse Modernization</a></li>
+      <li><a href="#part2">Data Migration &amp; Validation</a></li>
+      <li><a href="#part3">Analytics Engineering &amp; the Modern Stack</a></li>
+      <li><a href="#part4">Data Quality &amp; Observability</a></li>
+      <li><a href="#part5">Orchestration &amp; Pipeline Design</a></li>
+      <li><a href="#part6">Reporting / BI Modernization</a></li>
+      <li><a href="#part7">Architecture &amp; System Design</a></li>
+      <li><a href="#part8">How Design Interviews Are Scored</a></li>
+      <li><a href="#glossary">Quick-Recall Glossary</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ MAIN ============ -->
+  <main>
+
+  <!-- HOW TO USE -->
+  <section class="mod" id="how-to-use">
+    <h2><span class="num">00</span>How to use this</h2>
+    <p class="sub">A reference for recall, not a textbook to read once.</p>
+    <p>Each part moves from <strong>foundational concept → design decision → the trade-off question an interviewer will press on</strong>. Design rounds reward reasoning about trade-offs, not term recall — so for every concept, practice saying the <em class="term">why</em> and the <em class="term">alternative</em> out loud.</p>
+    <p>Every part ends with a <strong>Readings</strong> panel: a tight, curated list (not a link dump) of the best free source to actually learn that topic, with a one-line note on why it's worth your time. Pair this document with the <a class="inline" href="Data_Consulting_Study_Itinerary.html">Study Itinerary</a>, which sequences when to read and what to build.</p>
+    <div class="note">
+      <span class="tag">Orientation</span>
+      Three things show up in nearly every interview and nearly every engagement: <strong>declaring grain</strong> (Part 3), the <strong>lakehouse vs warehouse vs lake</strong> distinction (Part 1), and <strong>migration reconciliation</strong> (Part 2 — your differentiator). If you over-invest anywhere, over-invest there.
+    </div>
+  </section>
+
+  <!-- ===================== PART 1 ===================== -->
+  <section class="mod" id="part1">
+    <h2><span class="num">01</span>Data Platform &amp; Warehouse Modernization</h2>
+    <p class="sub">The architectures, storage formats, and engines you're hired to move clients toward.</p>
+
+    <h3>Core architectures — know the lineage</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Architecture</th><th>What it is</th><th>When to use</th><th>Trade-offs</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Data Warehouse</strong></td><td>Schema-on-write, structured, optimized for BI/SQL</td><td>Governed reporting, finance, defined KPIs</td><td>Rigid; costly for raw/unstructured data</td></tr>
+        <tr><td><strong>Data Lake</strong></td><td>Schema-on-read, raw files (Parquet/JSON) on object storage</td><td>Cheap raw storage, ML, exploration</td><td>"Data swamp" risk; weak governance/ACID</td></tr>
+        <tr><td><strong>Lakehouse</strong></td><td>Lake storage + warehouse semantics (ACID table format on object store)</td><td>Unify BI + ML on one copy of data</td><td>Newer tooling maturity; table-format lock-in</td></tr>
+        <tr><td><strong>Data Mesh</strong></td><td>Operating model: domain-owned data products, federated governance</td><td>Large orgs, many domains</td><td>Org maturity required; not a tech you install</td></tr>
+        <tr><td><strong>Data Fabric</strong></td><td>Metadata-driven integration layer across sources</td><td>Heterogeneous sprawl, virtualization</td><td>Complexity; tooling-heavy</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note"><span class="tag">The distinction interviewers want</span><strong>Lakehouse</strong> is an architecture pattern; <strong>Data Mesh</strong> is an organizational/ownership pattern. They're orthogonal — you can run a mesh on lakehouse tech.</div>
+
+    <h3>Table formats — the lakehouse enablers</h3>
+    <p><em class="term">Apache Iceberg, Delta Lake, Apache Hudi</em> are open table formats that add ACID transactions, schema evolution, time travel, and partition evolution on top of files in object storage.</p>
+    <div class="chips">
+      <span>metadata / manifest files</span><span>snapshot isolation</span><span>time travel</span><span>compaction / small-file problem</span><span>hidden partitioning (Iceberg)</span><span>copy-on-write vs merge-on-read</span>
+    </div>
+    <div class="interview"><span class="tag">Probe</span>"Why a table format instead of raw Parquet?" → ACID, concurrent writers, schema evolution, time travel, and decoupling the query engine from storage.</div>
+
+    <h3>Storage &amp; file concepts</h3>
+    <ul>
+      <li><strong>Columnar formats</strong> (Parquet, ORC): compression, predicate pushdown, column pruning.</li>
+      <li><strong>Row vs columnar:</strong> OLTP (row) vs OLAP (columnar) — the fundamental analytics storage choice.</li>
+      <li><strong>Partitioning</strong> (by date/key) vs <strong>clustering / Z-ordering / sort keys</strong> (data skipping).</li>
+      <li><strong>Small-file problem</strong> and compaction; target ~128MB–1GB files for analytics scans.</li>
+    </ul>
+
+    <h3>Compute &amp; warehouse engines</h3>
+    <ul>
+      <li><strong>Separation of storage and compute</strong> — the defining cloud-DW shift; Snowflake popularized it. Lets you scale each independently and isolate workloads.</li>
+      <li><strong>MPP fundamentals:</strong> shuffle, broadcast vs hash joins, partition pruning, data skew.</li>
+      <li><strong>Snowflake:</strong> virtual warehouses, micro-partitions, automatic clustering, time travel, zero-copy cloning, multi-cluster warehouses for concurrency, RBAC.</li>
+      <li><strong>Databricks:</strong> Spark execution model, Photon engine, Unity Catalog (governance), Delta Lake, clusters vs SQL warehouses, medallion architecture.</li>
+      <li><strong>BigQuery / Redshift / Synapse:</strong> BigQuery = serverless slots; Redshift = node-based MPP; Synapse = MS ecosystem.</li>
+    </ul>
+
+    <div class="interview"><span class="tag">Design prompts to rehearse</span>
+      "Migrate a legacy on-prem EDW (Teradata/Oracle/SQL Server) to a cloud lakehouse." · "Warehouse vs lakehouse — how do you choose for a client?" · "Size compute / control cost." · "Handle concurrency for 500 BI users." (multi-cluster compute, result caching, extracts vs live)
+    </div>
+
+    <details class="readings">
+      <summary>Readings — Platform &amp; Warehouse</summary>
+      <div class="body"><ul>
+        <li><span class="src">Databricks</span> — <em>"What is a Data Lakehouse?"</em> + <em>"Medallion Architecture"</em> glossary pages. <span class="why">Clearest free explanation of the lakehouse thesis and the Bronze/Silver/Gold layering you'll reuse everywhere.</span></li>
+        <li><span class="src">Snowflake docs</span> — <em>"Key Concepts &amp; Architecture"</em> (virtual warehouses, micro-partitions, separation of storage/compute). <span class="why">The canonical mental model for modern cloud DW; even if you target BigQuery, this framing is what interviewers speak.</span></li>
+        <li><span class="src">Apache Iceberg docs</span> — <em>"Iceberg Table Spec"</em> overview + the "why Iceberg" intro. <span class="why">Skim for the metadata/manifest/snapshot model; that's the table-format vocabulary.</span></li>
+        <li><span class="src">Google Cloud</span> — <em>"BigQuery explained: storage overview"</em> blog series. <span class="why">Your cloud target's internals — slots, columnar storage, partitioning/clustering.</span></li>
+        <li><span class="src">Book (skim)</span> — <em>Fundamentals of Data Engineering</em> (Reis &amp; Housley), Ch. 3 &amp; 6. <span class="why">The single best survey of the architecture landscape if you want one durable source.</span></li>
+      </ul></div>
+    </details>
+  </section>
+
+  <!-- ===================== PART 2 ===================== -->
+  <section class="mod" id="part2">
+    <h2><span class="num">02</span>Data Migration &amp; Validation</h2>
+    <p class="sub">Your stated specialty. Go deeper here than anywhere else — it's both an interview edge and a sellable Eigenbasis methodology.</p>
+
+    <h3>Migration strategy patterns</h3>
+    <ul>
+      <li><strong>Lift-and-shift</strong> (rehost) vs <strong>re-platform</strong> vs <strong>re-architect</strong> (refactor).</li>
+      <li><strong>Big-bang</strong> vs <strong>phased / incremental</strong> vs <strong>parallel run</strong>.</li>
+      <li><strong>Strangler pattern:</strong> incrementally route consumers off the legacy system as the new system proves out.</li>
+      <li><strong>Dual-write / shadow-write</strong> to compare old vs new during transition.</li>
+    </ul>
+
+    <h3>The migration lifecycle — be able to whiteboard this</h3>
+    <ol class="list">
+      <li><strong>Discovery &amp; assessment</strong> — source inventory, lineage, profiling, volumetrics, dependency mapping.</li>
+      <li><strong>Schema mapping &amp; conversion</strong> — type mapping, source quirks, surrogate keys.</li>
+      <li><strong>Initial (historical) load</strong> — bulk/backfill.</li>
+      <li><strong>CDC / incremental sync</strong> — keep target current during the cutover window.</li>
+      <li><strong>Validation &amp; reconciliation</strong> — see below.</li>
+      <li><strong>Cutover</strong> — freeze, final delta, switch consumers.</li>
+      <li><strong>Rollback plan</strong> — always have one.</li>
+      <li><strong>Decommission</strong> legacy.</li>
+    </ol>
+
+    <h3>Validation &amp; reconciliation — go deep</h3>
+    <ul>
+      <li><strong>Row count reconciliation</strong> (control totals).</li>
+      <li><strong>Aggregate / checksum reconciliation</strong> — SUM/MIN/MAX/hash of columns; column-level hashing (MD5/SHA over concatenated rows).</li>
+      <li><strong>Row-level diffing</strong> — minus/except queries, hash-comparison per primary key.</li>
+      <li><strong>Schema validation</strong> — types, nullability, constraints, precision/scale drift.</li>
+      <li><strong>Referential integrity</strong> across migrated tables.</li>
+      <li><strong>Parallel-run validation</strong> — run old &amp; new for N cycles, compare outputs.</li>
+      <li><strong>Sampling vs full reconciliation</strong> — cost/coverage trade-off; tiered (full counts + sampled deep checks).</li>
+      <li><strong>Tooling:</strong> custom SQL frameworks, dbt tests, Great Expectations, data-diff tools.</li>
+    </ul>
+    <div class="note warn"><span class="tag">Failure classes to name on sight</span>truncation · rounding · charset/collation · null vs empty string · date/timezone shifts · duplicate explosion from bad joins · late-arriving data. Naming these unprompted is the single strongest reconciliation signal you can give.</div>
+
+    <h3>CDC (Change Data Capture) — know the mechanisms</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Mechanism</th><th>How</th><th>Trade-off</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Log-based</strong></td><td>Read DB transaction log (Debezium, native)</td><td>Lowest source impact; captures deletes; most complex to run</td></tr>
+        <tr><td><strong>Query / timestamp</strong></td><td>Poll <code>updated_at</code></td><td>Simple; misses hard deletes; needs reliable timestamps</td></tr>
+        <tr><td><strong>Trigger-based</strong></td><td>DB triggers capture changes</td><td>Captures everything; adds source write overhead</td></tr>
+      </tbody>
+    </table></div>
+    <div class="chips"><span>idempotency</span><span>exactly-once vs at-least-once</span><span>watermarks</span><span>late / out-of-order data</span><span>tombstones (deletes)</span></div>
+
+    <div class="interview"><span class="tag">Probe — your sweet spot</span>"How do you validate a migration moved data correctly?" Walk the tiered ladder: row counts → column checksums → row-level hash diff on PK → schema/type validation → parallel run. Then name two failure classes you'd deliberately test for.</div>
+
+    <details class="readings">
+      <summary>Readings — Migration &amp; Validation</summary>
+      <div class="body"><ul>
+        <li><span class="src">Debezium docs</span> — <em>"CDC connectors" overview</em> + the FAQ on snapshot vs streaming. <span class="why">The reference implementation of log-based CDC; gives you the vocabulary (snapshots, tombstones, offsets) without needing to run it.</span></li>
+        <li><span class="src">Datafold blog</span> — posts on <em>data diffing</em> and <em>validating data migrations</em>. <span class="why">The clearest practitioner write-ups on reconciliation strategy specifically; mirrors the tiered approach above.</span></li>
+        <li><span class="src">Martin Fowler</span> — <em>"StranglerFigApplication"</em> + <em>"ParallelChange / expand-contract."</em> <span class="why">Canonical articulation of incremental migration safety; reframe these patterns for data and you sound senior.</span></li>
+        <li><span class="src">Great Expectations docs</span> — the "core concepts" tour (Expectations, Suites, Checkpoints). <span class="why">You'll use GE for source-to-target validation; learn the object model here.</span></li>
+        <li><span class="src">AWS / GCP migration whitepapers</span> — any cloud's "database migration best practices" guide. <span class="why">Vendor-neutral on the lifecycle; read for the cutover/rollback framing, ignore the product pitch.</span></li>
+      </ul></div>
+    </details>
+  </section>
+
+  <!-- ===================== PART 3 ===================== -->
+  <section class="mod" id="part3">
+    <h2><span class="num">03</span>Analytics Engineering &amp; the Modern Data Stack</h2>
+    <p class="sub">The dbt-centered core of most billable work — and the densest interview territory.</p>
+
+    <h3>The ELT paradigm</h3>
+    <p><strong>ETL vs ELT:</strong> the modern stack pushes transformation <em class="term">into</em> the warehouse (ELT) because cloud compute is cheap and elastic. The stack layers:</p>
+    <div class="ascii">ingestion (Fivetran/Airbyte/custom) → storage+compute (Snowflake/Databricks/BigQuery)
+   → transformation (dbt) → semantic layer → BI/activation (Power BI/Looker/Tableau)
+   ↑ orchestration (Airflow/Dagster)   ↑ observability + catalog (cross-cutting)</div>
+
+    <h3>dbt — the centerpiece (know cold)</h3>
+    <ul>
+      <li><strong>Models</strong> (SELECT materialized as table/view), <strong><code>ref()</code></strong> (builds the DAG), <strong><code>source()</code></strong>.</li>
+      <li><strong>Materializations:</strong> <code>view</code>, <code>table</code>, <code>incremental</code>, <code>ephemeral</code>, materialized view, <strong>snapshots</strong> (SCD2).</li>
+      <li><strong>Incremental models:</strong> <code>is_incremental()</code>, <code>unique_key</code>; strategies — append, merge, delete+insert, insert_overwrite; late-arriving data.</li>
+      <li><strong>Tests:</strong> generic (<code>unique</code>, <code>not_null</code>, <code>accepted_values</code>, <code>relationships</code>) + singular + packages (dbt_utils, dbt_expectations).</li>
+      <li><strong>Macros / Jinja</strong> for DRY, parameterized logic. <strong>Seeds, exposures, metrics, semantic models.</strong></li>
+      <li><strong>Docs &amp; lineage</strong> (auto-generated DAG), <strong>source freshness</strong>, <strong>packages</strong>.</li>
+      <li><strong><code>dbt build</code></strong> vs run/test/seed/snapshot; <strong>slim CI / <code>state:modified</code></strong> (deferral, build-only-changed); dev/prod targets; CI/CD.</li>
+    </ul>
+
+    <h3>Dimensional modeling (Kimball) — interviewers love this</h3>
+    <ul>
+      <li><strong>Star schema</strong> (fact + dimensions) vs <strong>snowflake schema</strong> (normalized dims).</li>
+      <li><strong>Fact tables:</strong> transaction, periodic snapshot, accumulating snapshot; measures are additive / semi-additive / non-additive.</li>
+      <li><strong>Dimensions:</strong> conformed, degenerate, role-playing, junk.</li>
+      <li><strong>Grain</strong> — <em class="term">the single most important interview word.</em> Always declare the grain first.</li>
+      <li><strong>SCD:</strong> Type 0/1/2/3/4/6 — be fluent in Type 1 (overwrite) vs Type 2 (history rows with effective/expiry dates + current flag).</li>
+      <li><strong>Surrogate vs natural keys</strong> · <strong>bridge tables</strong> (M:N) · <strong>factless fact tables</strong>.</li>
+    </ul>
+
+    <h3>Other modeling paradigms — name them, know when</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Paradigm</th><th>Shape</th><th>Best fit</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Inmon (3NF / CIF)</strong></td><td>Normalized enterprise warehouse, marts downstream (top-down)</td><td>Highly governed, single-version-of-truth orgs</td></tr>
+        <tr><td><strong>Data Vault 2.0</strong></td><td>Hubs / Links / Satellites</td><td>Regulated, many-source, auditability, parallel loads</td></tr>
+        <tr><td><strong>One Big Table (OBT)</strong></td><td>Wide denormalized</td><td>BI-tool performance &amp; simplicity on columnar DW</td></tr>
+        <tr><td><strong>Medallion</strong></td><td>Bronze → Silver → Gold</td><td>Databricks layering; maps to dbt staging→intermediate→marts</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>dbt project layering — the standard answer</h3>
+    <div class="ascii">staging (stg_)      1:1 with sources · rename/type/clean
+   → intermediate (int_) business logic · joins · reusable blocks
+   → marts (fct_/dim_)   dimensional, business-facing, domain-organized</div>
+
+    <h3>Semantic / metrics layer — hot topic</h3>
+    <p><strong>Problem it solves:</strong> "revenue" gets defined five different ways across BI tools. The layer centralizes metric and dimension definitions; BI tools query <em class="term">through</em> it for governed, consistent metrics ("headless BI").</p>
+    <div class="chips"><span>dbt Semantic Layer / MetricFlow</span><span>Cube</span><span>LookML</span><span>AtScale</span><span>Malloy</span><span>metrics: simple/ratio/cumulative/derived</span></div>
+    <p><strong>KPI governance:</strong> single source of truth for definitions, certified datasets, ownership, metric versioning, data contracts between producers and consumers.</p>
+
+    <div class="interview"><span class="tag">Probes</span>"Structure a dbt project." · "view vs table vs incremental — when each?" · "Implement SCD Type 2 in dbt." · "Design a star schema — what's your grain?" · "Build a semantic layer so finance and ops agree on revenue."</div>
+
+    <details class="readings">
+      <summary>Readings — Analytics Engineering &amp; dbt</summary>
+      <div class="body"><ul>
+        <li><span class="src">dbt Labs (free)</span> — <em>"dbt Fundamentals"</em> course + the <em>"How we structure our dbt projects"</em> guide. <span class="why">The course teaches the mechanics; the structure guide is the staging→marts answer interviewers expect, written by the people who invented the term "analytics engineer."</span></li>
+        <li><span class="src">Kimball Group</span> — the free <em>"Dimensional Modeling Techniques"</em> index pages. <span class="why">Authoritative source for grain, fact types, SCDs, conformed dimensions. Read the SCD and "declare the grain" entries closely.</span></li>
+        <li><span class="src">dbt docs</span> — <em>Materializations</em>, <em>Incremental models</em>, <em>Snapshots</em>. <span class="why">SCD2-via-snapshot and incremental strategies are the most-tested advanced topics; the docs are concise and exact.</span></li>
+        <li><span class="src">dbt Semantic Layer / MetricFlow docs</span> — the concepts page (semantic models, entities, measures, metrics). <span class="why">Learn the object model so you can speak the metrics-layer language even without a full build.</span></li>
+        <li><span class="src">Book</span> — <em>The Data Warehouse Toolkit</em> (Kimball), Ch. 1–5. <span class="why">If you read one modeling book, this is it. Skim for vocabulary; the worked examples cement grain.</span></li>
+      </ul></div>
+    </details>
+  </section>
+
+  <!-- ===================== PART 4 ===================== -->
+  <section class="mod" id="part4">
+    <h2><span class="num">04</span>Data Quality, Reliability &amp; Observability</h2>
+    <p class="sub">Trust is the product. This is where reliability-minded consultants get repeat business.</p>
+
+    <h3>The dimensions of data quality — recite these</h3>
+    <div class="chips"><span>Accuracy</span><span>Completeness</span><span>Consistency</span><span>Timeliness</span><span>Validity</span><span>Uniqueness</span><span>Integrity</span></div>
+
+    <h3>Observability — the 5 pillars</h3>
+    <div class="chips"><span>Freshness</span><span>Volume</span><span>Schema</span><span>Distribution</span><span>Lineage</span></div>
+    <p>Be able to give a monitoring example for each (e.g., Freshness → alert if a table hasn't updated in 25h against a 24h SLA; Distribution → alert if null-rate or a column's mean shifts beyond a baseline).</p>
+
+    <h3>Testing &amp; validation frameworks</h3>
+    <ul>
+      <li><strong>dbt tests</strong> (generic + singular), <strong>dbt_expectations</strong>, <strong>Great Expectations</strong> (suites, checkpoints, data docs), <strong>Soda</strong>, <strong>Monte Carlo</strong> (anomaly detection).</li>
+      <li><strong>Assertion-based</strong> (explicit rules) vs <strong>anomaly-detection</strong> (ML/statistical baselines) — precision vs coverage/maintenance trade-off.</li>
+    </ul>
+
+    <h3>Reliability engineering (DataOps)</h3>
+    <ul>
+      <li><strong>Data SLAs / SLOs / SLIs</strong> for pipelines (freshness, completeness).</li>
+      <li><strong>Data contracts</strong> — schema + semantic agreements enforced at the producer boundary.</li>
+      <li><strong>Circuit breakers</strong> — halt a pipeline on a failed quality gate to stop bad-data propagation.</li>
+      <li><strong>Idempotency &amp; reprocessing / backfills</strong> · <strong>quarantine / dead-letter</strong> for bad records.</li>
+      <li><strong>Root cause analysis</strong> via lineage; data <strong>incident management</strong>.</li>
+    </ul>
+
+    <div class="interview"><span class="tag">Probes</span>"Design a data quality framework for critical pipelines." · "5 pillars of observability — give a monitoring example for each." · "Where do you put a circuit breaker in an ELT flow?"</div>
+
+    <details class="readings">
+      <summary>Readings — Data Quality &amp; Observability</summary>
+      <div class="body"><ul>
+        <li><span class="src">Monte Carlo</span> — <em>"The 5 Pillars of Data Observability"</em> + their data-quality dimensions posts. <span class="why">They coined the 5-pillars framing; read it from the source so your vocabulary matches the field.</span></li>
+        <li><span class="src">Great Expectations docs</span> — the concepts tour + a profiling tutorial. <span class="why">Hands-on object model for assertion-based validation; you'll build a suite in the itinerary.</span></li>
+        <li><span class="src">dbt docs</span> — <em>"Tests"</em> + the <em>dbt_expectations</em> package README. <span class="why">The fastest path to test coverage on models; dbt_expectations ports GE-style checks into dbt.</span></li>
+        <li><span class="src">Chad Sanderson</span> — the <em>"Data Contracts"</em> essays (Substack / blog). <span class="why">The clearest practitioner case for contracts and producer-side enforcement; increasingly asked about in senior loops.</span></li>
+        <li><span class="src">Google SRE Book (free)</span> — the <em>SLO / SLI</em> chapter. <span class="why">Borrow the reliability vocabulary; reframing SRE for data pipelines reads as senior.</span></li>
+      </ul></div>
+    </details>
+  </section>
+
+  <!-- ===================== PART 5 ===================== -->
+  <section class="mod" id="part5">
+    <h2><span class="num">05</span>Orchestration &amp; Pipeline Design</h2>
+    <p class="sub">How the pieces run, retry, and recover.</p>
+
+    <h3>Orchestration concepts</h3>
+    <ul>
+      <li><strong>DAGs</strong>, tasks, dependencies, scheduling.</li>
+      <li><strong>Airflow</strong> (task-centric): operators, hooks, sensors, XComs, executors (Celery/Kubernetes), idempotent tasks, backfills, catchup, dynamic task mapping.</li>
+      <li><strong>Dagster</strong> (asset-centric): software-defined assets, I/O managers, partitions, type checks, observability-first. Contrast with Airflow's task model.</li>
+    </ul>
+
+    <h3>Pipeline design patterns</h3>
+    <div class="chips"><span>batch / streaming / micro-batch</span><span>idempotency</span><span>retries</span><span>exactly-once vs at-least-once</span><span>backfilling</span><span>watermarks</span><span>fan-in / fan-out</span><span>orchestration vs choreography</span></div>
+
+    <h3>Streaming vocabulary (even if batch-focused)</h3>
+    <ul>
+      <li><strong>Kafka:</strong> topics, partitions, consumer groups, offsets, log compaction.</li>
+      <li><strong>Stream processing:</strong> windowing (tumbling/sliding/session), event-time vs processing-time, watermarks, exactly-once.</li>
+      <li><strong>Lambda vs Kappa</strong> architecture (batch+stream vs stream-only).</li>
+    </ul>
+
+    <div class="interview"><span class="tag">Probes</span>"Airflow vs Dagster — contrast the models." · "Make a pipeline idempotent and handle backfills." · "Where do watermarks matter?"</div>
+
+    <details class="readings">
+      <summary>Readings — Orchestration</summary>
+      <div class="body"><ul>
+        <li><span class="src">Dagster docs</span> — <em>"Software-Defined Assets"</em> tutorial. <span class="why">The asset-centric model is the modern framing and runs cleanly on a Mac locally; this is your hands-on path.</span></li>
+        <li><span class="src">Astronomer / Airflow docs</span> — the <em>"Core Concepts"</em> + idempotency/backfill guides. <span class="why">Airflow is still the incumbent in most shops; know its task-centric vocabulary for interviews.</span></li>
+        <li><span class="src">Confluent</span> — <em>"Apache Kafka 101"</em> intro modules. <span class="why">Enough streaming vocabulary (partitions, offsets, consumer groups) to hold the conversation.</span></li>
+        <li><span class="src">Book</span> — <em>Designing Data-Intensive Applications</em> (Kleppmann), Ch. 11. <span class="why">The definitive treatment of stream processing, watermarks, and exactly-once if you want depth.</span></li>
+      </ul></div>
+    </details>
+  </section>
+
+  <!-- ===================== PART 6 ===================== -->
+  <section class="mod" id="part6">
+    <h2><span class="num">06</span>Reporting / BI Modernization</h2>
+    <p class="sub">Where the modernization work becomes visible to the business.</p>
+    <ul>
+      <li><strong>Live query vs import/extract</strong> (Power BI VertiPaq, Tableau extracts) — performance vs freshness.</li>
+      <li><strong>Star schema for BI</strong> — why BI tools love conformed stars.</li>
+      <li><strong>Pre-aggregation / aggregate tables / materialized views</strong> for dashboard speed.</li>
+      <li><strong>Row-level security (RLS)</strong> and governed access.</li>
+      <li><strong>Self-serve BI + semantic layer</strong> to prevent metric sprawl.</li>
+      <li><strong>Report rationalization</strong> — consolidate, certify, deprecate dead reports (usage analytics).</li>
+    </ul>
+    <div class="interview"><span class="tag">Probe</span>"Modernize 400 legacy SSRS/Excel reports — your approach?" → rationalize → consolidate onto governed marts → semantic layer → certified dashboards → deprecate by usage.</div>
+
+    <details class="readings">
+      <summary>Readings — BI Modernization</summary>
+      <div class="body"><ul>
+        <li><span class="src">Microsoft Learn</span> — Power BI <em>"Star schema guidance"</em> + <em>import vs DirectQuery</em>. <span class="why">Vendor-authored but genuinely the clearest explanation of the extract-vs-live trade-off and why stars matter for BI.</span></li>
+        <li><span class="src">Metabase docs</span> — the modeling + permissions guides. <span class="why">Your local BI tool in the itinerary; the permissions guide covers RLS hands-on.</span></li>
+        <li><span class="src">Looker / LookML intro</span> — the "what is a semantic model" overview. <span class="why">The original governed-metrics-in-BI approach; useful contrast to the dbt Semantic Layer.</span></li>
+      </ul></div>
+    </details>
+  </section>
+
+  <!-- ===================== PART 7 ===================== -->
+  <section class="mod" id="part7">
+    <h2><span class="num">07</span>Architecture &amp; System Design</h2>
+    <p class="sub">The cross-cutting reasoning that separates an implementer from an architect.</p>
+
+    <h3>Foundational trade-offs</h3>
+    <ul>
+      <li><strong>OLTP vs OLAP</strong>; normalization vs denormalization.</li>
+      <li><strong>CAP theorem</strong> &amp; <strong>PACELC</strong> (consistency / availability / latency).</li>
+      <li><strong>Consistency models:</strong> strong vs eventual.</li>
+      <li><strong>The eternal triangle:</strong> cost vs performance vs freshness — you're always trading among these.</li>
+      <li><strong>Push vs pull</strong>; schema-on-read vs schema-on-write.</li>
+    </ul>
+
+    <h3>Scalability &amp; distributed-systems basics</h3>
+    <div class="chips"><span>partitioning / sharding</span><span>replication</span><span>horizontal vs vertical scaling</span><span>data skew / hot partitions</span><span>shuffle cost</span><span>broadcast vs shuffle joins</span><span>caching / result caching</span><span>backpressure</span><span>dead-letter queues</span></div>
+
+    <h3>Governance, security, lineage</h3>
+    <ul>
+      <li><strong>Catalog &amp; metadata:</strong> Unity Catalog, Collibra, Alation, OpenMetadata, DataHub.</li>
+      <li><strong>Lineage</strong> (column- vs table-level), impact analysis.</li>
+      <li><strong>RBAC / ABAC</strong>, column/row-level security, masking / tokenization.</li>
+      <li><strong>Compliance:</strong> GDPR, CCPA, HIPAA, SOX, PCI — know which your target industries (healthcare, insurance, finance) care about.</li>
+      <li><strong>Data contracts</strong>, schema registry, <strong>MDM</strong>; <strong>FinOps</strong> (tagging, workload isolation, usage monitoring).</li>
+    </ul>
+
+    <h3>The reference modern-data-stack diagram — be able to draw it</h3>
+    <div class="ascii">Sources (OLTP DBs, SaaS APIs, files, events)
+        │
+   Ingestion (Fivetran / Airbyte / Debezium-CDC / custom)
+        │
+   Lake / Object Storage (GCS / S3 / ADLS) ──┐  raw landing (Bronze)
+        │                                     │
+   Warehouse / Lakehouse (BigQuery / Snowflake / Databricks)
+        │
+   Transformation (dbt: staging → intermediate → marts)   (Silver → Gold)
+        │
+   Semantic / Metrics Layer (dbt SL / Cube / LookML)
+        │
+   BI &amp; Activation (Power BI / Tableau / Looker / Reverse ETL)
+        │
+Cross-cutting: Orchestration (Airflow/Dagster) · Observability (GE/Soda/Monte Carlo)
+              · Catalog &amp; Governance (Unity/DataHub) · CI/CD · Cost/FinOps</div>
+
+    <details class="readings">
+      <summary>Readings — Architecture &amp; System Design</summary>
+      <div class="body"><ul>
+        <li><span class="src">Book (the one to own)</span> — <em>Designing Data-Intensive Applications</em> (Kleppmann), Ch. 1–6, 9. <span class="why">The reference for replication, partitioning, consistency, CAP. Nothing else explains the trade-offs as clearly.</span></li>
+        <li><span class="src">Book</span> — <em>Fundamentals of Data Engineering</em> (Reis &amp; Housley). <span class="why">The lifecycle + architecture survey tailored to exactly this consulting domain; pairs with DDIA's depth.</span></li>
+        <li><span class="src">DataHub / OpenMetadata docs</span> — the "what is data lineage / a data catalog" intros. <span class="why">Governance vocabulary (column lineage, impact analysis) you'll be expected to use.</span></li>
+        <li><span class="src">Cloud FinOps Foundation</span> — the "FinOps principles" overview. <span class="why">Cost-as-a-first-class-constraint framing; lets you talk spend like an architect, not just an engineer.</span></li>
+      </ul></div>
+    </details>
+  </section>
+
+  <!-- ===================== PART 8 ===================== -->
+  <section class="mod" id="part8">
+    <h2><span class="num">08</span>How Design Interviews Are Scored</h2>
+    <p class="sub">The meta-skill. Memorizing terms without this loop won't pass a senior round.</p>
+    <ol class="list">
+      <li><strong>Gather requirements first</strong> — volume, latency, consumers, SLAs, budget, sources — before designing.</li>
+      <li><strong>Declare assumptions &amp; constraints</strong> out loud.</li>
+      <li><strong>Reason about trade-offs</strong> — name the alternatives and justify; there's rarely one right answer.</li>
+      <li><strong>Grain / source-of-truth discipline</strong> (the analytics-engineering signal).</li>
+      <li><strong>Failure handling</strong> — what breaks, how you detect, how you recover (the reliability signal).</li>
+      <li><strong>Cost awareness</strong> — cloud spend is a first-class constraint.</li>
+      <li><strong>Incremental delivery / migration safety</strong> — rollback, parallel run, phased cutover.</li>
+      <li><strong>Governance &amp; quality baked in</strong>, not bolted on.</li>
+    </ol>
+    <div class="note"><span class="tag">The reusable answer shape</span>requirements → assumptions → declare grain / source-of-truth → propose design → name trade-offs &amp; alternatives → failure &amp; recovery → cost. Run every prompt through this loop.</div>
+    <h3>High-frequency prompts to rehearse</h3>
+    <ul>
+      <li>Migrate a legacy on-prem EDW to a cloud lakehouse — walk me through it.</li>
+      <li>Design the analytics layer for a company moving off spreadsheets.</li>
+      <li>Validate that a migration moved data correctly. <em>(your sweet spot)</em></li>
+      <li>Design a data quality / observability framework for critical pipelines.</li>
+      <li>Implement SCD Type 2 in dbt — explain the mechanics.</li>
+      <li>Build a semantic layer so finance and ops agree on "revenue."</li>
+      <li>Design an incremental dbt model handling late-arriving data.</li>
+      <li>Reduce Snowflake/BigQuery cost without hurting SLAs.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== GLOSSARY ===================== -->
+  <section class="mod" id="glossary">
+    <h2><span class="num">09</span>Quick-Recall Glossary</h2>
+    <p class="sub">Drill until instant. If you can't define one in a sentence, send yourself back to its part.</p>
+    <div class="chips">
+      <span>Grain</span><span>Conformed dimension</span><span>SCD Type 2</span><span>Surrogate key</span><span>Star vs snowflake</span><span>Fact types</span><span>ELT vs ETL</span><span>Medallion</span><span>Lakehouse vs warehouse vs lake</span><span>Table format</span><span>CDC (log/trigger/timestamp)</span><span>Idempotency</span><span>Watermark</span><span>Incremental strategy</span><span>Semantic layer</span><span>Data contract</span><span>5 pillars</span><span>7 quality dimensions</span><span>Reconciliation</span><span>Strangler / parallel run</span><span>Storage–compute separation</span><span>MPP / shuffle / skew</span><span>Z-order / clustering</span><span>Data Vault</span><span>Lambda vs Kappa</span><span>CAP / PACELC</span><span>Circuit breaker</span><span>Dead-letter</span>
+    </div>
+  </section>
+
+  </main>
+</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Eigenbasis Lab · Reference 01 — Concepts &amp; Readings.</strong> Companions: <a href="Data_Consulting_Tools_Guide.html">Tools Guide →</a> · <a href="Data_Consulting_Study_Itinerary.html">10-Week Study Itinerary →</a></p>
+    <p class="backtotop"><a href="#top">↑ back to top</a></p>
+  </div>
+</footer>
+
+<script>
+  // active-section highlighting in the TOC
+  const links = [...document.querySelectorAll('nav.toc a')];
+  const map = new Map(links.map(a=>[a.getAttribute('href').slice(1),a]));
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const a = map.get(e.target.id);
+        if(a) a.classList.add('active');
+      }
+    });
+  },{rootMargin:'-20% 0px -70% 0px',threshold:0});
+  document.querySelectorAll('section.mod').forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
