@@ -142,7 +142,7 @@
         <tr><td><strong>Dagster / Airflow</strong></td><td>Schedules &amp; orchestrates everything above</td><td>The conductor</td></tr>
       </tbody>
     </table></div>
-    <div class="mental"><span class="tag">Mental model</span>DuckDB is the <strong>kitchen</strong>, dbt is the <strong>recipe book</strong>, Great Expectations is the <strong>health inspector</strong>, Docker is a <strong>identical pop-up kitchen you can ship anywhere</strong>, and Dagster/Airflow is the <strong>head chef calling the order of service</strong>. PyArrow is the <strong>standard-size container</strong> every station passes food in.</p></div>
+    <div class="mental"><span class="tag">Mental model</span>DuckDB is the <strong>kitchen</strong>, dbt is the <strong>recipe book</strong>, Great Expectations is the <strong>health inspector</strong>, Docker is a <strong>identical pop-up kitchen you can ship anywhere</strong>, and Dagster/Airflow is the <strong>head chef calling the order of service</strong>. PyArrow is the <strong>standard-size container</strong> every station passes food in.</div>
   </section>
 
   <!-- UV -->
@@ -207,7 +207,7 @@ arrow_tbl = con.sql("SELECT * FROM orders").arrow()  <span class="c"># → PyArr
     <h4>What it is</h4>
     <p><strong>Apache Arrow</strong> is a standardized <em>columnar in-memory</em> format; <strong>PyArrow</strong> is its Python library. Its purpose is to let different tools (DuckDB, pandas, Polars, Spark, BigQuery clients) share data <em>without copying or re-serializing it</em> — "zero-copy." It's also the engine for reading/writing <strong>Parquet</strong> files.</p>
     <h4>The mental model</h4>
-    <div class="mental"><span class="tag">Mental model</span>Arrow is a <strong>shared shipping-container standard for data in RAM</strong>. Before Arrow, every tool packed data its own way, so handing off meant unpack-and-repack (slow). With Arrow, the container is universal — DuckDB can hand a table to pandas instantly because they already agree on the layout.</p></div>
+    <div class="mental"><span class="tag">Mental model</span>Arrow is a <strong>shared shipping-container standard for data in RAM</strong>. Before Arrow, every tool packed data its own way, so handing off meant unpack-and-repack (slow). With Arrow, the container is universal — DuckDB can hand a table to pandas instantly because they already agree on the layout.</div>
     <h4>Where you'll touch it</h4>
     <ul>
       <li><strong>Reading/writing Parquet</strong> — Parquet is on-disk columnar; Arrow is in-memory columnar. PyArrow bridges them.</li>
@@ -425,7 +425,7 @@ results = batch.validate()        <span class="c"># → pass/fail, feeds Data Do
                           Docker hosts the services that don't run natively</div>
     <p>Read it as the relay from the top of this guide, now wired up: Docker supplies the source DB and any heavyweight services, PyArrow/Parquet is the format passing between stages, DuckDB is the local warehouse (BigQuery in the cloud), dbt transforms, dbt-tests + GE validate, and Dagster conducts. Build this once as your capstone and you've used every tool in context — which is exactly what turns "familiar from work" into "can stand it up alone."</p>
     <div class="crosslinks" style="margin-top:8px;">
-      <a class="alt" href="Data_Consulting_Study_Itinerary.html">→ Put it into practice: the 10-Week Study Itinerary</a>
+      <a class="alt" href="Data_Consulting_Study_Itinerary.html">→ Put it into practice: the 12-Week Study Itinerary</a>
     </div>
   </section>
 
