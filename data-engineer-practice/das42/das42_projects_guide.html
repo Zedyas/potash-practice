@@ -128,16 +128,16 @@
     <tr><td>BI tool</td><td><strong>DuckDB SQL / Metabase</strong></td><td>Querying the marts (optional polish)</td></tr>
   </table>
   <h4>One-time install</h4>
-<pre><span class="c"># a clean Python environment</span>
-python -m venv venv
-<span class="k">source</span> venv/bin/activate          <span class="c"># Windows: venv\Scripts\activate</span>
+<pre><span class="c"># create the project — uv makes pyproject.toml + a managed .venv for you</span>
+uv init sales_mart
+<span class="k">cd</span> sales_mart
 
 <span class="c"># core tools for projects 1-5</span>
-pip install duckdb dbt-core dbt-duckdb pandas requests
+uv add duckdb dbt-core dbt-duckdb pandas requests
 
-<span class="c"># verify</span>
-dbt --version
-python -c <span class="s">"import duckdb; print('duckdb', duckdb.__version__)"</span></pre>
+<span class="c"># verify — `uv run` executes inside the project env; no activate step, ever</span>
+uv run dbt --version
+uv run python -c <span class="s">"import duckdb; print('duckdb', duckdb.__version__)"</span></pre>
   <div class="note"><span class="lab">Keep a differences log</span>
   Make a file <code class="inline">REAL_STACK_NOTES.md</code>. Each time the local tool differs from Snowflake/Fivetran/Airflow-in-prod, jot it down. By project 5 you'll have a ready-made "I practiced locally but understand production" talking point — the exact thing that turns a gap into initiative in the interview.</div>
 </section>
@@ -168,6 +168,7 @@ python -c <span class="s">"import duckdb; print('duckdb', duckdb.__version__)"</
 
   <h4>Project layout you'll end up with</h4>
   <div class="filetree"><b>sales_mart/</b>
+├── pyproject.toml            <span style="color:#888">← uv project + deps (uv made this)</span>
 ├── warehouse.duckdb          <span style="color:#888">← your local "Snowflake"</span>
 ├── load_raw.py               <span style="color:#888">← the extract+load script</span>
 ├── dbt_project.yml
@@ -199,7 +200,7 @@ con.execute(<span class="s">"CREATE OR REPLACE TABLE raw.customer  AS SELECT * F
 <span class="k">print</span>(<span class="s">"orders:"</span>, con.execute(<span class="s">"SELECT COUNT(*) FROM raw.orders"</span>).fetchone()[<span class="n">0</span>])
 <span class="k">print</span>(<span class="s">"customers:"</span>, con.execute(<span class="s">"SELECT COUNT(*) FROM raw.customer"</span>).fetchone()[<span class="n">0</span>])
 con.close()</pre>
-  <p>Run it: <code class="inline">python load_raw.py</code>. You should see row counts print. The E and L are done — by hand, exactly what a managed connector automates for you.</p>
+  <p>Run it: <code class="inline">uv run python load_raw.py</code>. You should see row counts print. The E and L are done — by hand, exactly what a managed connector automates for you.</p>
 
   <div class="step"><div class="step-num">2</div><div class="step-title">Configure dbt to talk to DuckDB</div></div>
   <p>Two small files. <code class="inline">profiles.yml</code> is the <em>only</em> thing that would change to point at Snowflake instead.</p>
@@ -288,15 +289,16 @@ models:
       - name: customer_id
         tests:
           - relationships:                 <span class="c"># FK integrity!</span>
-              to: ref(<span class="s">'dim_customer'</span>)
-              field: customer_id
+              arguments:                   <span class="c"># dbt now nests test args under `arguments:`</span>
+                to: ref(<span class="s">'dim_customer'</span>)
+                field: customer_id
   - name: dim_customer
     columns:
       - name: customer_id
         tests: [unique, not_null]</pre>
-<pre>dbt run      <span class="c"># builds staging (views) then marts (tables), in dependency order</span>
-dbt test     <span class="c"># runs unique / not_null / relationships checks</span>
-dbt docs generate && dbt docs serve   <span class="c"># open the lineage graph in a browser</span></pre>
+<pre>uv run dbt run      <span class="c"># builds staging (views) then marts (tables), in dependency order</span>
+uv run dbt test     <span class="c"># runs unique / not_null / relationships checks</span>
+uv run dbt docs generate && uv run dbt docs serve   <span class="c"># open the lineage graph in a browser</span></pre>
 
   <div class="step"><div class="step-num">7</div><div class="step-title">See your warehouse work</div></div>
   <p>Query the finished mart with a real star-schema question. The <code class="inline">duckdb</code> command-line tool is a separate one-line install (<code class="inline">brew install duckdb</code>, or download from duckdb.org); if you'd rather not install it, use the Python snippet just below instead.</p>
@@ -309,7 +311,7 @@ duckdb warehouse.duckdb <span class="s">"
   JOIN analytics.dim_date d ON f.order_date = d.date_day
   GROUP BY 1,2 ORDER BY revenue DESC LIMIT 10;
 "</span></pre>
-<pre><span class="c"># option B: same query, pure Python (only needs the duckdb you already pip-installed)</span>
+<pre><span class="c"># option B: same query, pure Python — run with `uv run python query.py` (uses the duckdb you already added)</span>
 <span class="k">import</span> duckdb
 con = duckdb.connect(<span class="s">"warehouse.duckdb"</span>)
 <span class="k">print</span>(con.execute(<span class="s">"""
@@ -336,17 +338,33 @@ con = duckdb.connect(<span class="s">"warehouse.duckdb"</span>)
   <div class="warn"><span class="lab">Version note that matters</span>
   Airflow 3.x (current) moved <code class="inline">BashOperator</code> out of core into the <em>standard provider</em> package, and the DAG class now comes from <code class="inline">airflow.sdk</code>. The imports below are the modern 3.x ones. If you ever see tutorials using <code class="inline">from airflow.operators.bash import BashOperator</code> or <code class="inline">from airflow import DAG</code>, that's the older 2.x style. Note this difference in your REAL_STACK_NOTES.md.</div>
 
-  <div class="step"><div class="step-num">1</div><div class="step-title">Install Airflow in standalone mode</div></div>
+  <div class="step"><div class="step-num">1</div><div class="step-title">Install Airflow in its OWN uv project, standalone mode</div></div>
+  <div class="note"><span class="lab">Why a separate project</span>
+  Do <strong>not</strong> add Airflow to your <code class="inline">sales_mart</code> project. Airflow has a huge, tightly-pinned dependency tree; sharing an env with dbt frequently breaks resolution. Give Airflow its own uv project/env, and let its DAG <em>shell out</em> to dbt's env — which is also how orchestrator and transform tool are deployed separately in production.</div>
   <p>Standalone runs the scheduler, the API/UI, and a local executor in one process — perfect for learning. It also creates the dags folder and prints a login.</p>
-<pre><span class="c"># pick an AIRFLOW_HOME so everything lives in one place</span>
+<pre><span class="c"># 1) a dedicated project + env for Airflow ONLY (not sales_mart)</span>
+mkdir ~/airflow-env && <span class="k">cd</span> ~/airflow-env
+uv init --python 3.13
+
+<span class="c"># 2) AIRFLOW_HOME = where Airflow keeps its db, config, and dags/ folder</span>
 <span class="k">export</span> AIRFLOW_HOME=~/airflow
 
-<span class="c"># install core + the standard provider (which now holds BashOperator)</span>
-pip install <span class="s">"apache-airflow"</span> <span class="s">"apache-airflow-providers-standard"</span>
+<span class="c"># 3) install core + the standard provider (which now holds BashOperator).</span>
+<span class="c">#    isolated like this, a plain add usually resolves fine:</span>
+uv add <span class="s">"apache-airflow"</span> <span class="s">"apache-airflow-providers-standard"</span>
 
 <span class="c"># first run: spins up the UI at http://localhost:8080 and prints an admin password</span>
-airflow standalone</pre>
+uv run airflow standalone</pre>
+  <div class="note"><span class="lab">If the install fails to resolve</span>
+  Airflow officially expects a <em>constraints file</em> that pins a known-good set of versions. If <code class="inline">uv add</code> errors, install with constraints instead (match the version + your Python). From <code class="inline">~/airflow-env</code>:
+<pre><span class="k">export</span> AIRFLOW_VERSION=3.0.0
+<span class="k">export</span> PY=3.13
+uv pip install <span class="s">"apache-airflow==${AIRFLOW_VERSION}"</span> <span class="s">"apache-airflow-providers-standard"</span> \
+  --constraint <span class="s">"https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PY}.txt"</span></pre>
+  <code class="inline">uv run airflow standalone</code> still works after this — <code class="inline">uv run</code> picks up the <code class="inline">.venv</code> in the folder.</div>
   <p>Leave it running. In a browser, open <code class="inline">localhost:8080</code> and log in with the printed credentials. You'll create the DAG file next; Airflow auto-discovers files dropped in <code class="inline">~/airflow/dags/</code>.</p>
+  <div class="note"><span class="lab">Two terminals from here on</span>
+  Terminal A stays on <code class="inline">uv run airflow standalone</code> (leave it running). Do everything else — editing the DAG, checking logs — in a second terminal. Closing terminal A stops Airflow.</div>
 
   <div class="step"><div class="step-num">2</div><div class="step-title">Write the DAG</div></div>
   <p>Create <code class="inline">~/airflow/dags/sales_pipeline.py</code>. Use absolute paths to your Project 1 folder so Airflow finds the script and dbt project regardless of where it runs from.</p>
@@ -355,9 +373,8 @@ airflow standalone</pre>
 <span class="k">from</span> airflow.sdk <span class="k">import</span> DAG                                  <span class="c"># 3.x: DAG comes from the SDK</span>
 <span class="k">from</span> airflow.providers.standard.operators.bash <span class="k">import</span> BashOperator  <span class="c"># 3.x path</span>
 
-<span class="c"># EDIT these two to your real absolute paths</span>
-PROJECT = <span class="s">"/Users/you/sales_mart"</span>
-VENV    = <span class="s">"/Users/you/sales_mart/venv/bin/activate"</span>
+<span class="c"># EDIT this to your real absolute path</span>
+PROJECT = <span class="s">"/Users/you/sales_mart"</span>   <span class="c"># uv run, called from here, uses this project's .venv</span>
 
 <span class="k">with</span> DAG(
     dag_id=<span class="s">"sales_pipeline"</span>,
@@ -370,18 +387,20 @@ VENV    = <span class="s">"/Users/you/sales_mart/venv/bin/activate"</span>
 
     extract_load = BashOperator(
         task_id=<span class="s">"extract_load"</span>,
-        bash_command=<span class="s">f"source {VENV} && cd {PROJECT} && python load_raw.py"</span>,
+        bash_command=<span class="s">f"cd {PROJECT} && uv run python load_raw.py"</span>,
     )
 
     dbt_build = BashOperator(
         task_id=<span class="s">"dbt_build"</span>,
         <span class="c"># dbt build = run + test in one command; DBT_PROFILES_DIR points at our profiles.yml</span>
-        bash_command=<span class="s">f"source {VENV} && cd {PROJECT} && DBT_PROFILES_DIR={PROJECT} dbt build"</span>,
+        bash_command=<span class="s">f"cd {PROJECT} && DBT_PROFILES_DIR={PROJECT} uv run dbt build"</span>,
     )
 
     extract_load &gt;&gt; dbt_build      <span class="c"># THE dependency: load must finish before transform</span></pre>
   <div class="note"><span class="lab">Concept: the dependency operator</span>
   <code class="inline">extract_load &gt;&gt; dbt_build</code> is the whole point. It tells Airflow "don't start the transform until the load succeeds." If <code class="inline">extract_load</code> fails, <code class="inline">dbt_build</code> never runs — which is exactly the data-integrity guarantee you want in a pipeline.</div>
+  <div class="note"><span class="lab">If a task fails with "uv: command not found"</span>
+  <code class="inline">BashOperator</code> runs a minimal shell that may not have <code class="inline">uv</code> on its PATH. Two fixes: launch <code class="inline">airflow standalone</code> from a terminal where <code class="inline">uv</code> works (it inherits that PATH) — usually enough; or, to be bulletproof, use uv's absolute path in the command. Find it with <code class="inline">which uv</code> (often <code class="inline">~/.local/bin/uv</code>) and write e.g. <code class="inline">cd {PROJECT} &amp;&amp; ~/.local/bin/uv run dbt build</code>.</div>
 
   <div class="step"><div class="step-num">3</div><div class="step-title">Run it and watch the graph</div></div>
   <ul>
@@ -513,7 +532,7 @@ VENV    = <span class="s">"/Users/you/sales_mart/venv/bin/activate"</span>
 
   <div class="step"><div class="step-num">3</div><div class="step-title">Point dbt at Snowflake — the only project change</div></div>
   <p>Install the Snowflake adapter and swap your profile. <strong>Your models/, tests, and sources don't change at all.</strong> That's the whole lesson: the transformation layer is portable.</p>
-<pre>pip install dbt-snowflake</pre>
+<pre>uv add dbt-snowflake</pre>
 <pre><span class="c"># profiles.yml — the ONLY file that differs from Project 1</span>
 sales_mart:
   target: sf
@@ -528,8 +547,8 @@ sales_mart:
       database: <span class="s">"SALES_MART"</span>
       schema: <span class="s">"ANALYTICS"</span>
       threads: <span class="n">4</span></pre>
-<pre>dbt run     <span class="c"># identical models now build as real Snowflake tables/views</span>
-dbt test    <span class="c"># same tests, executed by your XS warehouse</span></pre>
+<pre>uv run dbt run     <span class="c"># identical models now build as real Snowflake tables/views</span>
+uv run dbt test    <span class="c"># same tests, executed by your XS warehouse</span></pre>
 
   <div class="step"><div class="step-num">4</div><div class="step-title">Explore what DuckDB couldn't do</div></div>
   <p>Now play with the Snowflake-only features from the Snowflake guide, against your own data:</p>

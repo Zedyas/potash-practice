@@ -504,11 +504,11 @@ items <span class="tok-k">as</span> (
             <li>A <b>snapshot</b> capturing <code>order_status</code> over time (SCD Type 2).</li>
             <li><b>relationships</b> + <b>accepted_values</b> generic tests.</li>
             <li>A <b>macro</b>, a <b>seed</b>, and an <b>incremental</b> materialization.</li>
-            <li><code>dbt docs generate &amp;&amp; dbt docs serve</code> — screenshot the lineage DAG for your portfolio.</li>
+            <li><code>uv run dbt docs generate &amp;&amp; uv run dbt docs serve</code> — screenshot the lineage DAG for your portfolio.</li>
           </ul>
           <div class="checkpoint">
             <div class="lbl">✅ Checkpoint</div>
-            <p>Each box below is touched at least once and <code>dbt build</code> runs end to end. You can open the lineage graph and trace <code>raw_orders → stg_orders → fct_orders</code>.</p>
+            <p>Each box below is touched at least once and <code>uv run dbt build</code> runs end to end. You can open the lineage graph and trace <code>raw_orders → stg_orders → fct_orders</code>.</p>
           </div>
           <details class="nudge"><summary>💡 Nudge<span class="lvl">level 1</span></summary>
             <div class="body">Singular test idea: a query that selects orders where <code>delivered_at &lt; purchased_at</code> — if it returns rows, the test fails. Snapshot: dbt's <code>{% snapshot %}</code> block with <code>strategy='check'</code> on <code>order_status</code>.</div>
@@ -525,8 +525,24 @@ items <span class="tok-k">as</span> (
           strategy=<span class="tok-s">'check'</span>, check_cols=[<span class="tok-s">'order_status'</span>]) }}
 <span class="tok-k">select</span> order_id, order_status <span class="tok-k">from</span> {{ ref(<span class="tok-s">'stg_orders'</span>) }}
 {% endsnapshot %}</code></pre>
-              <p><b>Generic tests</b> in a <code>.yml</code>: <code>relationships</code> (order_items.order_id → orders.order_id) and <code>accepted_values</code> on <code>order_status</code> (delivered, shipped, canceled, …).</p>
-              <p><b>Incremental</b>: add <code>{{ config(materialized='incremental', unique_key='order_id') }}</code> with an <code>{% if is_incremental() %} where purchased_at > (select max(purchased_at) from {{ this }}) {% endif %}</code> guard. <b>Seed</b>: drop a small CSV in <code>seeds/</code> and <code>dbt seed</code>. <b>Macro</b>: a reusable <code>cents_to_dollars(col)</code> in <code>macros/</code>.</p>
+              <p><b>Generic tests</b> in a <code>.yml</code>: <code>relationships</code> (order_items.order_id → orders.order_id) and <code>accepted_values</code> on <code>order_status</code>. Current dbt nests test inputs under <code>arguments:</code> — the old flat form (args directly under the test name) still runs but is deprecated:</p>
+              <pre><code><span class="tok-k">models:</span>
+  - name: stg_order_items
+    columns:
+      - name: order_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref(<span class="tok-s">'stg_orders'</span>)
+                field: order_id
+  - name: stg_orders
+    columns:
+      - name: order_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [<span class="tok-s">'delivered'</span>, <span class="tok-s">'shipped'</span>, <span class="tok-s">'canceled'</span>]</code></pre>
+              <p><b>Incremental</b>: add <code>{{ config(materialized='incremental', unique_key='order_id') }}</code> with an <code>{% if is_incremental() %} where purchased_at > (select max(purchased_at) from {{ this }}) {% endif %}</code> guard. <b>Seed</b>: drop a small CSV in <code>seeds/</code> and <code>uv run dbt seed</code>. <b>Macro</b>: a reusable <code>cents_to_dollars(col)</code> in <code>macros/</code>.</p>
               <p>Then <code>uv run dbt docs generate &amp;&amp; uv run dbt docs serve</code> and screenshot the DAG.</p>
             </div>
           </details>
